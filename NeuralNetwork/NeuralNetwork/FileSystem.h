@@ -1,12 +1,21 @@
 #pragma once
+
+#ifndef FileSystem_H_
+#define FileSystem_H_
+
 #include <iostream>
 #include <windows.h>
 #include <string>
 #include <locale>
 #include <codecvt>
 #include <vector>
+#include <fstream>
 
 using namespace std;
+
+class NeuralNetwork;
+struct Layer;
+class Neuron;
 
 class FileSystem
 {
@@ -17,6 +26,8 @@ public:
 	wstring getCurDir();
 	wstring organizeLayer(const string &networkName, const string &layerID); // returns path to layer dir
 	void organizeNetwork(const string &networkName);
+	void createWeightFile(vector<Neuron>* neurons, const wstring &path, const string &connectedWith);
+
 private:
 	wstring currentPath = L""; // path to .exe file
 	wstring networkPath = L""; // path to network dir
@@ -26,3 +37,5 @@ private:
 	int StringToWString(std::wstring &ws, const std::string &s);
 	wstring strToWstr(const string &s);
 };
+
+#endif //  FileSystem_H_

@@ -1,4 +1,5 @@
 #include "Neuron.h"
+#include "NeuralNetwork.h"
 
 float sigm(float x)  // standart Activation Function
 {
@@ -25,7 +26,8 @@ void Neuron::activate()
 {
 	for (auto it = this->edges.begin(); it != this->edges.end(); ++it)
 	{
-		(*it)->son->increase(((*it)->weight) * (this->data));
+		for (auto vectorIt = it->second.begin(); vectorIt != it->second.end(); ++vectorIt)
+			(*vectorIt)->son->increase(((*vectorIt)->weight) * (this->data));
 	}
 }
 
@@ -45,15 +47,23 @@ void Neuron::setActivationFunction(float(*f)(float))
 	this->activationFunction = f;
 }
 
-void Neuron::createLink(Neuron & connectWith)
+void Neuron::createLink(Neuron & connectWith, const string &layerTo)
 {
 	TEdge *newEdge = new TEdge();
 	newEdge->son = &connectWith;
 	newEdge->weight = 0.0f;
-	this->edges.push_back(newEdge);
+	//newEdge->layerFrom = move(layerFrom);
+	newEdge->layerTo = move(layerTo);
+	//this->edges.push_back(newEdge);
+	this->edges[layerTo].push_back(newEdge);
 }
 
 float Neuron::getData()
 {
 	return (this->data);
+}
+
+std::map<string, std::vector<TEdge*>>* Neuron::getEdges()
+{
+	return &this->edges;
 }

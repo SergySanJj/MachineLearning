@@ -10,7 +10,8 @@ int main()
 	FileSystem fs;
 	net.addLayer(5, "kek");
 	net.addLayer(6, "lol");
-	net.connectLayers("lol", "kek");
+	net.connectLayers("kek", "lol");
+	net.connectLayers("kek", "kek");
 	float mass[5] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
 	net.setLayerData(mass, "kek");
 	system("pause");
@@ -29,6 +30,6 @@ int main()
 FILE SYSTEM:
 name of network:
 	layer name:
-		weights.txt ///
+		id1_id2.txt ///
 
 */

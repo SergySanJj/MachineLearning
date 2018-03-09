@@ -1,4 +1,5 @@
 #include "FileSystem.h"
+#include "NeuralNetwork.h"
 
 FileSystem::FileSystem()
 {
@@ -27,6 +28,21 @@ wstring FileSystem::organizeLayer(const string & networkName, const string & lay
 void FileSystem::organizeNetwork(const string & networkName)
 {
 	createNetworkDir(strToWstr(networkName));
+}
+
+void FileSystem::createWeightFile(vector<Neuron>* neurons, const wstring & path, const string &connectedWith)
+{
+	ofstream fout(path);
+	for (auto it = neurons->begin(); it != neurons->end(); ++it)
+	{
+		for (auto vIt = it->getEdges()->find(connectedWith)->second.begin(); vIt != it->getEdges()->find(connectedWith)->second.end(); ++vIt)
+		{
+			fout << (*vIt)->weight << ' ';
+		}
+		fout << '\n';
+	}
+
+	fout.close();
 }
 
 void FileSystem::createNetworkDir(const wstring &name)
