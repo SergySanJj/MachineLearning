@@ -33,6 +33,7 @@ public:
 	void setActivationFunction(float(*f)(float));
 	void createLink(Neuron &connectWith, const string &layerTo);
 	float getData();
+	std::map< string, std::vector< TEdge* > >* getEdges();
 private:
 	float data = 0.0f;
 	std::map< string, std::vector< TEdge* > > edges;

@@ -23,6 +23,12 @@ inline bool checkForFileName(const string &layerID)
 		checkIn(layerID, "*"));
 }
 
+wstring StringToWString(const std::string & s)
+{
+	std::wstring wsTmp(s.begin(), s.end());
+	return wsTmp;
+}
+
 NeuralNetwork::NeuralNetwork(const string &name) :networkName(name)
 {
 	this->fs.organizeNetwork(name);
@@ -38,7 +44,7 @@ NeuralNetwork::~NeuralNetwork()
 
 void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string &layerID)
 {
-	if (checkForFileName(layerID)) // check on _ . < > , \ / ? * in id 
+	if (checkForFileName(layerID)) // check on _ . < > , \ / ? * in id
 	{
 		throw ID_HAS_ERRORS;
 		exit(ID_HAS_ERRORS);
@@ -63,8 +69,9 @@ bool NeuralNetwork::connectLayers(const string &ID1, const string &ID2)
 	{
 		(*(this->layers.find(ID1))).second->linkWithLayer((*(this->layers.find(ID2))).second);
 		wstring pathToWeights = (*(this->layers.find(ID1))).second->getPath();
+		pathToWeights += L"\\" + StringToWString(ID1) + L"_" + StringToWString(ID2) + L".txt";
 
-
+		this->fs.createWeightFile(this->layers.find(ID1)->second->getNeurons(), pathToWeights, ID2);
 		return 1;
 	}
 	else

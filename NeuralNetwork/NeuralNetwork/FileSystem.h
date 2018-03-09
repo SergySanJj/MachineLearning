@@ -9,6 +9,7 @@
 #include <locale>
 #include <codecvt>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -25,7 +26,7 @@ public:
 	wstring getCurDir();
 	wstring organizeLayer(const string &networkName, const string &layerID); // returns path to layer dir
 	void organizeNetwork(const string &networkName);
-	void createWeightFile(vector<Neuron>* neurons);
+	void createWeightFile(vector<Neuron>* neurons, const wstring &path, const string &connectedWith);
 
 private:
 	wstring currentPath = L""; // path to .exe file

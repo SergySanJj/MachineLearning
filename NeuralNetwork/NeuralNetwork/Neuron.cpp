@@ -26,7 +26,8 @@ void Neuron::activate()
 {
 	for (auto it = this->edges.begin(); it != this->edges.end(); ++it)
 	{
-		(*it)->son->increase(((*it)->weight) * (this->data));
+		for (auto vectorIt = it->second.begin(); vectorIt != it->second.end(); ++vectorIt)
+			(*vectorIt)->son->increase(((*vectorIt)->weight) * (this->data));
 	}
 }
 
@@ -53,10 +54,16 @@ void Neuron::createLink(Neuron & connectWith, const string &layerTo)
 	newEdge->weight = 0.0f;
 	//newEdge->layerFrom = move(layerFrom);
 	newEdge->layerTo = move(layerTo);
-	this->edges.push_back(newEdge);
+	//this->edges.push_back(newEdge);
+	this->edges[layerTo].push_back(newEdge);
 }
 
 float Neuron::getData()
 {
 	return (this->data);
+}
+
+std::map<string, std::vector<TEdge*>>* Neuron::getEdges()
+{
+	return &this->edges;
 }

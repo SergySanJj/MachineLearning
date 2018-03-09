@@ -11,6 +11,7 @@ int main()
 	net.addLayer(5, "kek");
 	net.addLayer(6, "lol");
 	net.connectLayers("kek", "lol");
+	net.connectLayers("kek", "kek");
 	float mass[5] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
 	net.setLayerData(mass, "kek");
 	system("pause");
