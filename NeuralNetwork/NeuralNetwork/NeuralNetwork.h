@@ -1,15 +1,21 @@
 #pragma once
+
+#ifndef NeuralNetwork_H_
+#define NeuralNetwork_H_
+
 #include <fstream>
 #include "Neuron.h"
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <iterator>
-#include "FileSystem.h"
 
 using namespace std;
 
 #define ID_ALREADY_EXISTS 1
+#define ID_HAS_ERRORS     2
+
+class FileSystem;
 
 struct Layer
 {
@@ -18,7 +24,7 @@ private:
 	string id = "";
 	unsigned int size = 0;
 	wstring pathToLayer = L"";
-	string networkName = "";
+	string networkName = "";  // must be without _ . < > , \ / ? * symbols
 
 	float(*activationFunction)(float);
 
@@ -39,6 +45,8 @@ public:
 	template <size_t N>
 	bool setLayerData(float(&mas)[N]);
 	void linkWithLayer(Layer *linkWith);
+
+	vector<Neuron>* getNeurons();
 };
 
 #define layerPair pair< string, Layer* >
@@ -89,3 +97,5 @@ bool Layer::setLayerData(float(&mas)[N])
 		return 1;
 	}
 }
+
+#endif // NeuralNetwork_H_ 

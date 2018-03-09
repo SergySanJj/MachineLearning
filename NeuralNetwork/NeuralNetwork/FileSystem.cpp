@@ -1,4 +1,5 @@
 #include "FileSystem.h"
+#include "NeuralNetwork.h"
 
 FileSystem::FileSystem()
 {

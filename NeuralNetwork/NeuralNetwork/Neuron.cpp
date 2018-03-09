@@ -1,4 +1,5 @@
 #include "Neuron.h"
+#include "NeuralNetwork.h"
 
 float sigm(float x)  // standart Activation Function
 {
@@ -45,11 +46,13 @@ void Neuron::setActivationFunction(float(*f)(float))
 	this->activationFunction = f;
 }
 
-void Neuron::createLink(Neuron & connectWith)
+void Neuron::createLink(Neuron & connectWith, const string &layerTo)
 {
 	TEdge *newEdge = new TEdge();
 	newEdge->son = &connectWith;
 	newEdge->weight = 0.0f;
+	//newEdge->layerFrom = move(layerFrom);
+	newEdge->layerTo = move(layerTo);
 	this->edges.push_back(newEdge);
 }
 
