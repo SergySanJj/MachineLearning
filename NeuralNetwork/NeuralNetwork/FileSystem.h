@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #pragma once
 
 #ifndef FileSystem_H_
@@ -14,8 +15,11 @@
 using namespace std;
 
 class NeuralNetwork;
-struct Layer;
+class Layer;
 class Neuron;
+
+typedef const string& Acstr;
+typedef const wstring& Acwstr;
 
 class FileSystem
 {
@@ -23,19 +27,31 @@ public:
 	FileSystem();
 	~FileSystem();
 
-	wstring getCurDir();
-	wstring organizeLayer(const string &networkName, const string &layerID); // returns path to layer dir
-	void organizeNetwork(const string &networkName);
-	void createWeightFile(vector<Neuron>* neurons, const wstring &path, const string &connectedWith);
+	wstring getCurDir();                                 // Returns current directory path.
+
+	wstring organizeLayer(const string& networkName,
+		                  const string& layerID);        // Returns path to layer dir.
+
+	void organizeNetwork(const string& networkName);     // Creates directory in
+														 // current directory with network name.
+
+	void createWeightFile(vector<Neuron>* neurons,       // Creates file with weights of neurons.
+		                  const wstring&  path,            
+		                  const string&   connectedWith);
+
+	void deleteNetwork();
 
 private:
-	wstring currentPath = L""; // path to .exe file
-	wstring networkPath = L""; // path to network dir
+	wstring currentPath = L"";                          // Path to .exe file.
+	wstring networkPath = L"";                          // path to network dir.
 
-	void createNetworkDir(const wstring &name);
-	wstring createLayerDir(const wstring &name); // returns path to layer dir
-	int StringToWString(std::wstring &ws, const std::string &s);
-	wstring strToWstr(const string &s);
+	void createNetworkDir(const wstring& name);         // Creates network directory and put
+														// path value into networkPath field.
+
+	wstring createLayerDir(const wstring& name);        // Returns path to layer dir.
+
+	int StringToWString(wstring& ws, const string& s);  // Changes wstring argument.
+	wstring strToWstr(const string& s);                 // Converts and returns wstring.
 };
 
 #endif //  FileSystem_H_
