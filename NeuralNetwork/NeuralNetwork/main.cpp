@@ -14,8 +14,12 @@ int main()
 
 	net.connectLayers("input", "between");
 	net.connectLayers("between", "output");
+
+	net.randomizeWeights("input", "between", -1.0f, 2.0f);
+	net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "input", "between");
+	net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "between", "output");
 	float mass[5] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
-	net.setLayerData(mass, "kek");
+	net.setLayerData(mass, "input");
 	system("pause");
 	net.deleteNetworkFiles();
 	system("pause");

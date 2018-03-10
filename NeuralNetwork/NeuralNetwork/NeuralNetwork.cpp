@@ -1,37 +1,37 @@
 #include "NeuralNetwork.h"
 #include "FileSystem.h"
 
-float sigmoidFunction(float x)    // standart Activation Function
+float sigmoidFunction(float x)    // Standart Activation Function.
 {
 	return (1.0f / (1.0f + float(pow(e, -x))));
 }
 
-inline bool checkIn(const  string &strIn, const  string &str)
+inline bool checkIn(const string& strIn, const string& str)
 {
 	return (strIn.find(str) != string::npos);
 }
 
-inline bool checkForFileName(const  string &layerID)
+inline bool checkForFileName(const string& layerID)
 {
-	return (checkIn(layerID, ".") &&
-		checkIn(layerID, "_") &&
-		checkIn(layerID, "/") &&
-		checkIn(layerID, "\\") &&
-		checkIn(layerID, "?") &&
-		checkIn(layerID, "<") &&
-		checkIn(layerID, ">") &&
-		checkIn(layerID, "*"));
+	return (checkIn(layerID, "." ) &&
+		    checkIn(layerID, "_" ) &&
+		    checkIn(layerID, "/" ) &&
+		    checkIn(layerID, "\\") &&
+		    checkIn(layerID, "?" ) &&
+		    checkIn(layerID, "<" ) &&
+		    checkIn(layerID, ">" ) &&
+		    checkIn(layerID, "*" ));
 }
 
-wstring StringToWString(const std::string & s)
+wstring StringToWString(const string& s)
 {
-	std::wstring wsTmp(s.begin(), s.end());
+	wstring wsTmp(s.begin(), s.end());
 	return wsTmp;
 }
 
-/////////////
+///////////////////** NeuralNetwork **/////////////////////////////
 
-NeuralNetwork::NeuralNetwork(const  string &name) :networkName(name)
+NeuralNetwork::NeuralNetwork(const string& name) :networkName(name)
 {
 	this->fs.organizeNetwork(name);
 }
@@ -44,7 +44,7 @@ NeuralNetwork::~NeuralNetwork()
 	}
 }
 
-void NeuralNetwork::addLayer(unsigned int neuronQuantity, const  string &layerID)
+void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string& layerID)
 {
 	if (checkForFileName(layerID)) // check on _ . < > , \ / ? * in id
 	{
@@ -61,17 +61,20 @@ void NeuralNetwork::addLayer(unsigned int neuronQuantity, const  string &layerID
 	else
 	{
 		throw ID_ALREADY_EXISTS; // DO SOMETHING or write catch in wrapper for network class
-		exit(ID_ALREADY_EXISTS);
+		exit( ID_ALREADY_EXISTS );
 	}
 }
 
-bool NeuralNetwork::connectLayers(const  string &ID1, const  string &ID2)
+bool NeuralNetwork::connectLayers(const string& ID1, const string& ID2)
 {
 	if (checkLayerExist(ID1) && checkLayerExist(ID2))
 	{
 		(*(this->layers.find(ID1))).second->linkWithLayer((*(this->layers.find(ID2))).second);
+
 		wstring pathToWeights = (*(this->layers.find(ID1))).second->getPath();
-		pathToWeights += L"\\" + StringToWString(ID1) + L"_" + StringToWString(ID2) + L".txt";
+
+		pathToWeights += L"\\" + StringToWString(ID1) + 
+			             L"_" + StringToWString(ID2) + L".txt";
 
 		this->fs.createWeightFile(this->layers.find(ID1)->second->getNeurons(), pathToWeights, ID2);
 		return 1;
@@ -80,16 +83,19 @@ bool NeuralNetwork::connectLayers(const  string &ID1, const  string &ID2)
 		return 0;
 }
 
-bool NeuralNetwork::loadWeightsFromFile(const wstring & pathToFile, const  string & IDFrom, const  string & IDTo)
+bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
+	                                    const  string&  IDFrom,
+	                                    const  string&  IDTo)
 {
-	std::map< string, std::vector< TEdge* > >* pVectorEdges = this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+	map< string, vector< TEdge* > >* pVectorEdges =
+		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
 
 	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
 		return 0;
-	
+
 	ifstream fin(pathToFile);
-	for (auto it  = pVectorEdges->find(IDTo)->second.begin();
-		      it != pVectorEdges->find(IDTo)->second.end(); ++it)
+	for (auto it = pVectorEdges->find(IDTo)->second.begin();
+		it != pVectorEdges->find(IDTo)->second.end(); ++it)
 	{
 		fin >> (*it)->weight;
 	}
@@ -97,22 +103,53 @@ bool NeuralNetwork::loadWeightsFromFile(const wstring & pathToFile, const  strin
 	return 1;
 }
 
-bool NeuralNetwork::saveWeightsToDirectory(const wstring &pathToDirectory, const  string & IDFrom, const  string & IDTo)
+bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory, 
+	                                       const  string& IDFrom, 
+	                                       const  string& IDTo)
 {
-	std::map< string, std::vector< TEdge* > >* pVectorEdges = this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+	map< string, vector< TEdge* > >* pVectorEdges = 
+		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
 
-	if (pVectorEdges->find(IDTo) ==	pVectorEdges->end())
+	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
 		return 0;
 
-	wstring tmpPath = pathToDirectory + L"\\" + StringToWString(IDFrom) + StringToWString(IDTo) + L"_.txt";
-	ifstream fout(tmpPath);
-	for (auto it  = pVectorEdges->find(IDTo)->second.begin();
+	wstring tmpPath = pathToDirectory + L"\\" + 
+		              StringToWString(IDFrom) + L"_" +
+		              StringToWString(IDTo)   + L"_.txt";
+
+	ofstream fout(tmpPath);
+
+	for (auto it =  pVectorEdges->find(IDTo)->second.begin();
 		      it != pVectorEdges->find(IDTo)->second.end(); ++it)
 	{
-		fout >> (*it)->weight;
+		fout << (*it)->weight << " ";
 	}
+
 	fout.close();
 	return 1;
+}
+
+bool NeuralNetwork::randomizeWeights(const string & IDFrom, const string & IDTo, const float & a, const float & b)
+{
+	if (this->layers.find(IDFrom) == this->layers.end())
+		return 0;
+	else
+	{
+		std::random_device rd;
+		std::mt19937 mt(rd());
+		std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
+
+		for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
+			      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+		{
+			for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin();
+				      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+			{
+				(*vIt)->weight = float(dist(mt));
+			}
+		}
+		return 1;
+	}
 }
 
 void NeuralNetwork::deleteNetworkFiles()
@@ -120,13 +157,13 @@ void NeuralNetwork::deleteNetworkFiles()
 	this->fs.deleteNetwork();
 }
 
-inline bool NeuralNetwork::checkLayerExist(const  string & ID)
+inline bool NeuralNetwork::checkLayerExist(const string&  ID)
 {
 	if (this->layers.find(ID) != this->layers.cend())
-	{
 		return 1;
-	}
-	return 0;
+
+	else
+		return 0;
 }
 
 Layer::Layer(int n, string id) :id(id), size(n)
@@ -146,12 +183,12 @@ wstring Layer::getPath()
 	return this->pathToLayer;
 }
 
-void Layer::setPath(const wstring &path)
+void Layer::setPath(const wstring& path)
 {
 	this->pathToLayer = move(path);
 }
 
-void Layer::setNetworkName(const  string &name)
+void Layer::setNetworkName(const string& name)
 {
 	this->networkName = move(name);
 }
@@ -168,7 +205,8 @@ unsigned int Layer::getSize()
 
 void Layer::setActivationFunction(float(*f)(float))
 {
-	for (auto it = this->neurons->begin(); it != this->neurons->end(); ++it)
+	for (auto it  = this->neurons->begin(); 
+		      it != this->neurons->end(); ++it)
 	{
 		(*it).setActivationFunction(f);
 	}
@@ -176,7 +214,8 @@ void Layer::setActivationFunction(float(*f)(float))
 
 void Layer::activateFunction()
 {
-	for (auto it = this->neurons->begin(); it != this->neurons->end(); ++it)
+	for (auto it  = this->neurons->begin();
+		      it != this->neurons->end(); ++it)
 	{
 		(*it).activateFunction();
 	}
@@ -194,20 +233,23 @@ float Layer::getNeuronData(unsigned int n)
 
 void Layer::linkWithLayer(Layer * linkWith)
 {
-	for (auto layer1 = this->neurons->begin(); layer1 != this->neurons->end(); ++layer1)
+	for (auto layer1  = this->neurons->begin(); 
+		      layer1 != this->neurons->end(); ++layer1)
 	{
-		for (auto layer2 = linkWith->neurons->begin(); layer2 != linkWith->neurons->end(); ++layer2)
+		for (auto layer2  = linkWith->neurons->begin();
+			      layer2 != linkWith->neurons->end(); ++layer2)
 		{
 			(*layer1).createLink(*layer2, linkWith->getID());
 		}
 	}
 }
 
-void Layer::outputData(const wstring & pathToFile)
+void Layer::outputData(const wstring&  pathToFile)
 {
 	ofstream fout(pathToFile);
 
-	for (auto it = this->neurons->begin(); it != this->neurons->end(); ++it)
+	for (auto it  = this->neurons->begin();
+		      it != this->neurons->end(); ++it)
 	{
 		fout << (*it).getData() << '\n';
 	}

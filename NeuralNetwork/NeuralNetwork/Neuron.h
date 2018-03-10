@@ -8,10 +8,12 @@
 #include <map>
 #include "FileSystem.h"
 
+using namespace std;
+
 #define e 2.71828f
 
 class Neuron;
-struct Layer;
+class Layer;
 
 struct TEdge
 {
@@ -31,13 +33,13 @@ public:
 	inline void increase(float value);
 	float activateFunction();
 	void setActivationFunction(float(*f)(float));
-	void createLink(Neuron &connectWith, const  string &layerTo);
+	void createLink(Neuron& connectWith, const string& layerTo);
 	float getData();
-	std::map< string, std::vector< TEdge* > >* getEdges();
+	map< string, vector< TEdge* > >* getEdges();
 private:
 	float data = 0.0f;
-	std::map< string, std::vector< TEdge* > > edges;
-	//std::vector< TEdge* > edges;
+	map< string, vector< TEdge* > > edges;
+	//vector< TEdge* > edges;
 	float(*activationFunction)(float);
 };
 
