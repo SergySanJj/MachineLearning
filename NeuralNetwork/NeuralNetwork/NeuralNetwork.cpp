@@ -6,12 +6,12 @@ float sigmoidFunction(float x)    // standart Activation Function
 	return (1.0f / (1.0f + float(pow(e, -x))));
 }
 
-inline bool checkIn(const string &strIn, const string &str)
+inline bool checkIn(const  string &strIn, const  string &str)
 {
 	return (strIn.find(str) != string::npos);
 }
 
-inline bool checkForFileName(const string &layerID)
+inline bool checkForFileName(const  string &layerID)
 {
 	return (checkIn(layerID, ".") &&
 		checkIn(layerID, "_") &&
@@ -29,7 +29,9 @@ wstring StringToWString(const std::string & s)
 	return wsTmp;
 }
 
-NeuralNetwork::NeuralNetwork(const string &name) :networkName(name)
+/////////////
+
+NeuralNetwork::NeuralNetwork(const  string &name) :networkName(name)
 {
 	this->fs.organizeNetwork(name);
 }
@@ -42,7 +44,7 @@ NeuralNetwork::~NeuralNetwork()
 	}
 }
 
-void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string &layerID)
+void NeuralNetwork::addLayer(unsigned int neuronQuantity, const  string &layerID)
 {
 	if (checkForFileName(layerID)) // check on _ . < > , \ / ? * in id
 	{
@@ -63,7 +65,7 @@ void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string &layerID)
 	}
 }
 
-bool NeuralNetwork::connectLayers(const string &ID1, const string &ID2)
+bool NeuralNetwork::connectLayers(const  string &ID1, const  string &ID2)
 {
 	if (checkLayerExist(ID1) && checkLayerExist(ID2))
 	{
@@ -78,7 +80,47 @@ bool NeuralNetwork::connectLayers(const string &ID1, const string &ID2)
 		return 0;
 }
 
-inline bool NeuralNetwork::checkLayerExist(const string & ID)
+bool NeuralNetwork::loadWeightsFromFile(const wstring & pathToFile, const  string & IDFrom, const  string & IDTo)
+{
+	std::map< string, std::vector< TEdge* > >* pVectorEdges = this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+
+	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
+		return 0;
+	
+	ifstream fin(pathToFile);
+	for (auto it  = pVectorEdges->find(IDTo)->second.begin();
+		      it != pVectorEdges->find(IDTo)->second.end(); ++it)
+	{
+		fin >> (*it)->weight;
+	}
+	fin.close();
+	return 1;
+}
+
+bool NeuralNetwork::saveWeightsToDirectory(const wstring &pathToDirectory, const  string & IDFrom, const  string & IDTo)
+{
+	std::map< string, std::vector< TEdge* > >* pVectorEdges = this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+
+	if (pVectorEdges->find(IDTo) ==	pVectorEdges->end())
+		return 0;
+
+	wstring tmpPath = pathToDirectory + L"\\" + StringToWString(IDFrom) + StringToWString(IDTo) + L"_.txt";
+	ifstream fout(tmpPath);
+	for (auto it  = pVectorEdges->find(IDTo)->second.begin();
+		      it != pVectorEdges->find(IDTo)->second.end(); ++it)
+	{
+		fout >> (*it)->weight;
+	}
+	fout.close();
+	return 1;
+}
+
+void NeuralNetwork::deleteNetworkFiles()
+{
+	this->fs.deleteNetwork();
+}
+
+inline bool NeuralNetwork::checkLayerExist(const  string & ID)
 {
 	if (this->layers.find(ID) != this->layers.cend())
 	{
@@ -109,7 +151,7 @@ void Layer::setPath(const wstring &path)
 	this->pathToLayer = move(path);
 }
 
-void Layer::setNetworkName(const string &name)
+void Layer::setNetworkName(const  string &name)
 {
 	this->networkName = move(name);
 }
@@ -159,6 +201,18 @@ void Layer::linkWithLayer(Layer * linkWith)
 			(*layer1).createLink(*layer2, linkWith->getID());
 		}
 	}
+}
+
+void Layer::outputData(const wstring & pathToFile)
+{
+	ofstream fout(pathToFile);
+
+	for (auto it = this->neurons->begin(); it != this->neurons->end(); ++it)
+	{
+		fout << (*it).getData() << '\n';
+	}
+
+	fout.close();
 }
 
 vector<Neuron>* Layer::getNeurons()

@@ -47,14 +47,12 @@ void Neuron::setActivationFunction(float(*f)(float))
 	this->activationFunction = f;
 }
 
-void Neuron::createLink(Neuron & connectWith, const string &layerTo)
+void Neuron::createLink(Neuron & connectWith, const  string &layerTo)
 {
 	TEdge *newEdge = new TEdge();
 	newEdge->son = &connectWith;
 	newEdge->weight = 0.0f;
-	//newEdge->layerFrom = move(layerFrom);
 	newEdge->layerTo = move(layerTo);
-	//this->edges.push_back(newEdge);
 	this->edges[layerTo].push_back(newEdge);
 }
 

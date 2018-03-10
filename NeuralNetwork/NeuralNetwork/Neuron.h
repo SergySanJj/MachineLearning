@@ -31,7 +31,7 @@ public:
 	inline void increase(float value);
 	float activateFunction();
 	void setActivationFunction(float(*f)(float));
-	void createLink(Neuron &connectWith, const string &layerTo);
+	void createLink(Neuron &connectWith, const  string &layerTo);
 	float getData();
 	std::map< string, std::vector< TEdge* > >* getEdges();
 private:
