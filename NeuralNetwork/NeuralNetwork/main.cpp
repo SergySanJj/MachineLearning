@@ -8,18 +8,29 @@ int main()
 {
 	NeuralNetwork net("lifeGame");
 	FileSystem fs;
-	net.addLayer(5, "input");
-	net.addLayer(28, "between");
+	net.addLayer(2, "input");
+	net.addLayer(4, "between");
 	net.addLayer(3, "output");
 
 	net.connectLayers("input", "between");
 	net.connectLayers("between", "output");
 
-	net.randomizeWeights("input", "between", -1.0f, 2.0f);
-	net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "input", "between");
-	net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "between", "output");
-	float mass[5] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+	net.loadWeightsFromFile(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\input_between_.txt", "input", "between");
+	net.loadWeightsFromFile(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\between_output_.txt", "between", "output");
+
+	float mass[2] = { 0.1f, 0.2f };
 	net.setLayerData(mass, "input");
+
+	net.activateLayer("input");
+	net.activateLayer("between");
+
+	net.outputDataToFile("output", L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\result.txt");
+
+	//net.randomizeWeights("input", "between", -1.0f, 1.0f);
+	//net.randomizeWeights("between", "output", -1.0f, 1.0f);
+
+	//net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "input", "between");
+	//net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "between", "output");
 	system("pause");
 	net.deleteNetworkFiles();
 	system("pause");

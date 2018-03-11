@@ -32,8 +32,7 @@ public:
 	wstring organizeLayer(const string& networkName,
 		                  const string& layerID);        // Returns path to layer dir.
 
-	void organizeNetwork(const string& networkName);     // Creates directory in
-														 // current directory with network name.
+	void organizeNetwork(const string& networkName);     // Creates directory in current directory with network name.
 
 	void createWeightFile(vector<Neuron>* neurons,       // Creates file with weights of neurons.
 		                  const wstring&  path,            
@@ -45,8 +44,7 @@ private:
 	wstring currentPath = L"";                          // Path to .exe file.
 	wstring networkPath = L"";                          // path to network dir.
 
-	void createNetworkDir(const wstring& name);         // Creates network directory and put
-														// path value into networkPath field.
+	void createNetworkDir(const wstring& name);         // Creates network directory and put path value into networkPath field.
 
 	wstring createLayerDir(const wstring& name);        // Returns path to layer dir.
 

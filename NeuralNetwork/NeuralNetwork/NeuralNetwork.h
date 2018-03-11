@@ -39,6 +39,7 @@ public:
 	void            activateFunction();
 	void            linkWithLayer(Layer *linkWith);
 	void            outputData(const wstring& pathToFile);
+	void            activate();
 
 private:
 	vector<Neuron> *neurons = nullptr;
@@ -75,7 +76,14 @@ public:
 		                        const  string& IDFrom,
 		                        const  string& IDTo);
 
-	bool randomizeWeights(const  string& IDFrom, const  string& IDTo, const float &a, const float &b); // set layer weights to random [a..b]
+	bool randomizeWeights(const  string& IDFrom, 
+		                  const  string& IDTo,
+		                  const   float& a,
+		                  const   float& b); // set layer weights to random [a..b]
+
+	void activateLayer(const string& ID);
+
+	void outputDataToFile(const string& ID, const wstring& path);
 
 	void deleteNetworkFiles();
 private:
