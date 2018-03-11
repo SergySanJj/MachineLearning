@@ -112,6 +112,8 @@ void FileSystem::createWeightFile(vector<Neuron>* neurons,
 	                              const  string&  connectedWith)
 {
 	ofstream fout(path);
+	fout << fixed;
+	fout.precision(11);
 	for (auto it  = neurons->begin();
 		      it != neurons->end(); ++it)
 	{

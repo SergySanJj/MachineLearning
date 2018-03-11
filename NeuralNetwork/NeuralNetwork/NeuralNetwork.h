@@ -40,6 +40,7 @@ public:
 	void            linkWithLayer(Layer *linkWith);
 	void            outputData(const wstring& pathToFile);
 	void            activate();
+	void            clearData();
 
 private:
 	vector<Neuron> *neurons = nullptr;
@@ -62,6 +63,8 @@ public:
 	template <size_t N>
 	bool setLayerData(float(&mas)[N], const string& ID);
 
+	float* getData(const string& ID);
+
 	void addLayer(unsigned int  neuronQuantity,
 		          const string& layerID);
 
@@ -81,9 +84,19 @@ public:
 		                  const   float& a,
 		                  const   float& b); // set layer weights to random [a..b]
 
+	bool addRandomValueToWeights(const  string& IDFrom,
+		                         const  string& IDTo,
+		                         const   float& a,
+		                         const   float& b); // adds to layer weights random floats [a..b]
+	void mutate(const float &a, const float &b);
+
 	void activateLayer(const string& ID);
 
 	void outputDataToFile(const string& ID, const wstring& path);
+
+	void activatonFunction(const string &ID);
+
+	bool clearLayerData(const string& ID);
 
 	void deleteNetworkFiles();
 private:
