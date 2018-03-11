@@ -137,8 +137,7 @@ void FileSystem::createNetworkDir(const wstring& name)
 	path.append(L"\\");
 	path.append(name);
 	CreateDirectoryW(path.c_str(), nullptr);
-	this->networkPath = move(path); // Start string was const so we don't need to c_str(),
-									// also we can not do copy and just use move().
+	this->networkPath = move(path); // Start string was const so we don't need to c_str().
 }
 
 wstring FileSystem::createLayerDir(const wstring& name)

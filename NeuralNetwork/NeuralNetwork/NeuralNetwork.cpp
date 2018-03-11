@@ -94,10 +94,15 @@ bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
 		return 0;
 
 	ifstream fin(pathToFile);
-	for (auto it = pVectorEdges->find(IDTo)->second.begin();
-		it != pVectorEdges->find(IDTo)->second.end(); ++it)
+
+	for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin();
+		      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 	{
-		fin >> (*it)->weight;
+		for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin();
+			      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+		{
+			fin >> (*vIt)->weight;
+		}
 	}
 	fin.close();
 	return 1;
@@ -119,10 +124,15 @@ bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory,
 
 	ofstream fout(tmpPath);
 
-	for (auto it =  pVectorEdges->find(IDTo)->second.begin();
-		      it != pVectorEdges->find(IDTo)->second.end(); ++it)
+	for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin(); 
+		      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 	{
-		fout << (*it)->weight << " ";
+		for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin(); 
+			      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+		{
+			fout << (*vIt)->weight << ' ';
+		}
+		fout << '\n';
 	}
 
 	fout.close();
@@ -139,7 +149,7 @@ bool NeuralNetwork::randomizeWeights(const string & IDFrom, const string & IDTo,
 		std::mt19937 mt(rd());
 		std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
 
-		for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
+		for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin();
 			      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 		{
 			for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin();
@@ -150,6 +160,16 @@ bool NeuralNetwork::randomizeWeights(const string & IDFrom, const string & IDTo,
 		}
 		return 1;
 	}
+}
+
+void NeuralNetwork::activateLayer(const string & ID)
+{
+	(*(this->layers.find(ID))).second->activate();
+}
+
+void NeuralNetwork::outputDataToFile(const string & ID, const wstring & path)
+{
+	(*(this->layers.find(ID))).second->outputData(path);
 }
 
 void NeuralNetwork::deleteNetworkFiles()
@@ -255,6 +275,15 @@ void Layer::outputData(const wstring&  pathToFile)
 	}
 
 	fout.close();
+}
+
+void Layer::activate()
+{
+	for (auto it  = this->neurons->begin();
+		      it != this->neurons->end(); ++it)
+	{
+		(*it).activate();
+	}
 }
 
 vector<Neuron>* Layer::getNeurons()
