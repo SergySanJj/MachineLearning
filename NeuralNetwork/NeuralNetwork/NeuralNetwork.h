@@ -30,8 +30,6 @@ public:
 	float           getNeuronData(unsigned int n);
 	unsigned int    getSize();
 
-	template <size_t N>
-	bool            setLayerData(float(&mas)[N]);
 	void            setPath(const wstring& path);
 	void            setNetworkName(const string& name);
 	void            setActivationFunction(float(*f)(float));
@@ -41,6 +39,22 @@ public:
 	void            outputData(const wstring& pathToFile);
 	void            activate();
 	void            clearData();
+
+	template <size_t N>
+	bool            setLayerData(float(&mas)[N])
+	{
+		if (N < this->size)
+			return 0;
+		else
+		{
+			for (auto it = this->neurons->begin();
+				it != this->neurons->end(); ++it)
+			{
+				(*it).setInput(mas[distance(this->neurons->begin(), it)]);
+			}
+			return 1;
+		}
+	}
 
 private:
 	vector<Neuron> *neurons = nullptr;
@@ -60,8 +74,7 @@ public:
 	NeuralNetwork(const string& name);
 	~NeuralNetwork();
 
-	template <size_t N>
-	bool setLayerData(float(&mas)[N], const string& ID);
+	
 
 	float* getData(const string& ID);
 
@@ -99,6 +112,20 @@ public:
 	bool clearLayerData(const string& ID);
 
 	void deleteNetworkFiles();
+
+	template <size_t N>
+	bool setLayerData(float(&mas)[N], const string& ID)
+	{
+		if (checkLayerExist(ID))
+		{
+			(*(this->layers.find(ID))).second->setLayerData(mas);
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 private:
 	unordered_map<string, Layer*> layers; // key, point to the layer of nodes
 	string networkName = "a";
@@ -109,34 +136,6 @@ private:
 
 //////////////////** templates **///////////////////////////
 
-template<size_t N>
-bool NeuralNetwork::setLayerData(float(&mas)[N], const string& ID)
-{
-	if (checkLayerExist(ID))
-	{
-		(*(this->layers.find(ID))).second->setLayerData(mas);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
 
-template <size_t N>
-bool Layer::setLayerData(float(&mas)[N])
-{
-	if (N < this->size)
-		return 0;
-	else
-	{
-		for (auto it  = this->neurons->begin();
-			      it != this->neurons->end(); ++it)
-		{
-			(*it).setInput(mas[distance(this->neurons->begin(), it)]);
-		}
-		return 1;
-	}
-}
 
 #endif // NeuralNetwork_H_ 

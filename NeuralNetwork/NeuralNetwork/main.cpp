@@ -26,8 +26,6 @@ int main()
 	float mass[2] = { 21.1f, 8.2f };
 	net.setLayerData(mass, "input");
 
-	wstring outputPath = L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\result";
-
 	for (int i = 0; i < 5; i++)
 	{
 		net.mutate(-0.9f, 0.9f);
