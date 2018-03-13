@@ -252,6 +252,21 @@ void NeuralNetwork::deleteNetworkFiles()
 	this->fs.deleteNetwork();
 }
 
+bool NeuralNetwork::setLayerData(float mas[], unsigned int n, const string & ID)
+{
+	{
+		if (checkLayerExist(ID))
+		{
+			(*(this->layers.find(ID))).second->setLayerData(mas, n);
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+}
+
 inline bool NeuralNetwork::checkLayerExist(const string&  ID)
 {
 	if (this->layers.find(ID) != this->layers.cend())
@@ -368,6 +383,23 @@ void Layer::clearData()
 		      neurons != this->neurons->end(); ++neurons)
 	{
 		(*neurons).setInput(0.0f);
+	}
+}
+
+bool Layer::setLayerData(float mas[], unsigned int n)
+{
+	{
+		if (n < this->size)
+			return 0;
+		else
+		{
+			for (auto it = this->neurons->begin();
+				it != this->neurons->end(); ++it)
+			{
+				(*it).setInput(mas[distance(this->neurons->begin(), it)]);
+			}
+			return 1;
+		}
 	}
 }
 

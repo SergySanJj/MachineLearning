@@ -39,7 +39,6 @@ public:
 private:
 	float data = 0.0f;
 	map< string, vector< TEdge* > > edges;
-	//vector< TEdge* > edges;
 	float(*activationFunction)(float);
 };
 
