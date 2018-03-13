@@ -1,6 +1,6 @@
 #include "Player.h"
 #include "LifeGame.h"
-//#include "NeuralNetwork.h"
+#include "NeuralNetwork.h"
 
 Player::Player(int n, int m, int playerID)
 {
@@ -11,7 +11,7 @@ Player::Player(int n, int m, int playerID)
 	std::uniform_real_distribution<int> disty(0, std::nextafter(m-2, INT_MAX));
 	*/
 
-	//this->neuro = new NeuralNetwork("payer_" + to_string(this->playerID));
+	this->neuro = new NeuralNetwork("payer_" + to_string(this->playerID));
 }
 
 

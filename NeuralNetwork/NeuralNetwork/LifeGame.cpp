@@ -2,9 +2,11 @@
 #include "Player.h"
 
 
-LifeGame::LifeGame(int n, int m) :_n(n), _m(m)
+LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
 {
 	this->_field = new Field(n, m);
+	for (int i = 0; i < numberOfPlayers; i++)
+		this->players.push_back(new Player(n, m, i));
 }
 
 

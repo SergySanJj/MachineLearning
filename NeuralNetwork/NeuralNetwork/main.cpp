@@ -2,13 +2,14 @@
 #include "NeuralNetwork.h"
 #include "FileSystem.h"
 #include "LifeGame.h"
+#include "Player.h"
 
 
 using namespace std;
 
 int main()
 {
-	LifeGame ldf(10, 10);
+	LifeGame ldf(10, 10,10);
 	ldf.printField();
 
 	NeuralNetwork net("lifeGame");
@@ -24,7 +25,7 @@ int main()
 	//net.loadWeightsFromFile(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\between_output_.txt", "between", "output");
 
 	float mass[2] = { 21.1f, 8.2f };
-	net.setLayerData(mass, "input");
+	net.setLayerData(mass, 2, "input");
 
 	for (int i = 0; i < 5; i++)
 	{

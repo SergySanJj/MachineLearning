@@ -30,6 +30,7 @@ public:
 	float           getNeuronData(unsigned int n);
 	unsigned int    getSize();
 
+	bool            setLayerData(float mas[], unsigned int n);
 	void            setPath(const wstring& path);
 	void            setNetworkName(const string& name);
 	void            setActivationFunction(float(*f)(float));
@@ -39,22 +40,6 @@ public:
 	void            outputData(const wstring& pathToFile);
 	void            activate();
 	void            clearData();
-
-	template <size_t N>
-	bool            setLayerData(float(&mas)[N])
-	{
-		if (N < this->size)
-			return 0;
-		else
-		{
-			for (auto it = this->neurons->begin();
-				it != this->neurons->end(); ++it)
-			{
-				(*it).setInput(mas[distance(this->neurons->begin(), it)]);
-			}
-			return 1;
-		}
-	}
 
 private:
 	vector<Neuron> *neurons = nullptr;
@@ -74,7 +59,7 @@ public:
 	NeuralNetwork(const string& name);
 	~NeuralNetwork();
 
-	
+	bool setLayerData(float mas[], unsigned int n, const string& ID);
 
 	float* getData(const string& ID);
 
@@ -113,19 +98,6 @@ public:
 
 	void deleteNetworkFiles();
 
-	template <size_t N>
-	bool setLayerData(float(&mas)[N], const string& ID)
-	{
-		if (checkLayerExist(ID))
-		{
-			(*(this->layers.find(ID))).second->setLayerData(mas);
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
 private:
 	unordered_map<string, Layer*> layers; // key, point to the layer of nodes
 	string networkName = "a";

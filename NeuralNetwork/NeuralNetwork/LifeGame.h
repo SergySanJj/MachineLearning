@@ -15,7 +15,7 @@ using namespace std;
 */
 
 
-#define N 5  // Player info vector size
+#define INFOSIZE 5  // Player info vector size
 
 class Player;
 
@@ -39,7 +39,7 @@ private:
 class LifeGame
 {
 public:
-	LifeGame(int n, int m);
+	LifeGame(int n, int m, int numberOfPlayers);
 	~LifeGame();
 
 	int* getPlayerInfo();

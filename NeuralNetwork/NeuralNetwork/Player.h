@@ -3,11 +3,13 @@
 #ifndef Player_H_
 #define Player_H_
 
-#include <random>
+
+using namespace std;
 
 #define MAXFIELD 1000.0f
 #define DEAFULTHEALTH 100.0
 
+class NeuralNetwork;
 
 class Player
 {
@@ -25,7 +27,7 @@ private:
 	int pos_x = 0;
 	int pos_y = 0;
 
-	//NeuralNetwork* neuro;
+	NeuralNetwork* neuro;
 
 };
 
