@@ -3,6 +3,8 @@
 #ifndef Player_H_
 #define Player_H_
 
+#include <ctime>
+#include <stdlib.h>
 
 using namespace std;
 
