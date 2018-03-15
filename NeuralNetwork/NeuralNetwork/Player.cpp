@@ -2,25 +2,47 @@
 #include "LifeGame.h"
 #include "NeuralNetwork.h"
 
-Player::Player(int n, int m, int playerID)
+Player::Player(int n, int m, int playerID, LifeGame* game)
 {
-	/*
-	std::random_device rd;
-	std::mt19937 mt(rd());
-	std::uniform_real_distribution<int> distx(0, std::nextafter(n-2, INT_MAX));
-	std::uniform_real_distribution<int> disty(0, std::nextafter(m-2, INT_MAX));
-	*/
-	srand(time(0));
-	int rndx = rand() + n;
-	int rndy = rand() + m;
-
-	this->pos_x = rndx;
-	this->pos_y = rndy;
+	uniform_int_distribution<int> range_n{ 0,n };
+	uniform_int_distribution<int> range_m{ 0,m };
+	default_random_engine re{};
 
 	this->neuro = new NeuralNetwork("payer_" + to_string(this->playerID));
+
+	this->currGame = game;
+
+	this->pos_x = range_n(re);
+	this->pos_y = range_m(re);
+
+	while (this->currGame->getXY(this->pos_x, this->pos_y) != '_')
+	{
+		this->pos_x = range_n(re);
+		this->pos_y = range_m(re);
+	}
+
+	setXY(this->pos_x, this->pos_y, '*', *game);
 }
 
 
 Player::~Player()
 {
+	delete this->neuro;
 }
+
+int Player::get_X()
+{
+	return this->pos_x;
+}
+
+int Player::get_Y()
+{
+	return this->pos_y;
+}
+
+float Player::getHealth()
+{
+	return this->health;
+}
+
+
