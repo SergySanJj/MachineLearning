@@ -36,6 +36,14 @@ private:
 	char** _field = nullptr;
 };
 
+struct stepNode
+{
+	int _x = 0;
+	int _y = 0;
+
+	Player* _player = nullptr;
+};
+
 class LifeGame
 {
 public:
@@ -45,6 +53,9 @@ public:
 	int* getPlayerInfo();
 	void makeAction(int actionID);
 
+	void step();
+
+	char getXY(int X, int Y);
 	void printField();
 private:
 	int _n = 1;
@@ -52,6 +63,9 @@ private:
 	unsigned int _step = 0;
 	Field* _field = nullptr;
 	vector<Player*> players;
+
+	friend void setXY(int X, int Y, char symbol, LifeGame&);
+	friend void movePlayer(int pl_x, int pl_y, int new_x, int new_y, LifeGame&);
 };
 
 #endif // !LifeGame_H_

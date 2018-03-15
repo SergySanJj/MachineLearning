@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include "NeuralNetwork.h"
 #include "FileSystem.h"
@@ -12,6 +13,11 @@ int main()
 	LifeGame ldf(10, 10,10);
 	ldf.printField();
 
+
+
+
+	system("pause");
+	/*
 	NeuralNetwork net("lifeGame");
 	FileSystem fs;
 	net.addLayer(5, "input");
@@ -24,8 +30,8 @@ int main()
 	//net.loadWeightsFromFile(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\input_between_.txt", "input", "between");
 	//net.loadWeightsFromFile(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\between_output_.txt", "between", "output");
 
-	float mass[2] = { 21.1f, 8.2f };
-	net.setLayerData(mass, 2, "input");
+	float mass[5] = { 1, 2, 3, 4, 5 };
+	net.setLayerData(mass, 5, "input");
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -38,7 +44,7 @@ int main()
 
 		net.activatonFunction("output");
 
-		wstring tmp = L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves\\result";
+		wstring tmp = L"saves\\result";
 		tmp += to_wstring(i);
 		tmp += L".txt";
 		net.outputDataToFile("output", tmp);
@@ -53,9 +59,11 @@ int main()
 
 	//net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "input", "between");
 	//net.saveWeightsToDirectory(L"F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\saves", "between", "output");
-	system("pause");
-	net.deleteNetworkFiles();
-	system("pause");
+	//system("pause");
+	//net.deleteNetworkFiles();
+	*/
+
+	
 	return 0;
 }
 
