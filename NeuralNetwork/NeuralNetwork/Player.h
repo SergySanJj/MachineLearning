@@ -5,11 +5,16 @@
 
 #include <ctime>
 #include <stdlib.h>
+#include <string>
 
 using namespace std;
 
 #define MAXFIELD 1000.0f
-#define DEAFULTHEALTH 100.0
+#define DEFAULTHEALTH 100.0
+
+#define EMPTY_  '_'
+#define PLAYER_ '*'
+#define FOOD_   '+'
 
 /// COMMANDS ///
 
@@ -17,31 +22,32 @@ using namespace std;
 class NeuralNetwork;
 class LifeGame;
 
-class Player
+class Player 
 {
 public:
 	Player(int n, int m, int playerID, LifeGame* game);
 	~Player();
 
+	NeuralNetwork * neuro = nullptr;
+
 	int get_X();
 	int get_Y();
 	float getHealth();
+	void clearNeuroData();
+	void activateNeuro(float* input);
+	void mutate();
 
-	pair<int,int> step(float* inputData); // returns pair with new coordinates
+	//pair<int,int> step(float* inputData); // returns pair with new coordinates
 
 private:
 	int playerID = 0;
 
-	float health = DEAFULTHEALTH;
-	float closestFood_X = MAXFIELD;
-	float closestFood_Y = MAXFIELD;
+	float health = DEFAULTHEALTH;
 
 	LifeGame* currGame = nullptr;
 
 	int pos_x = 0;
 	int pos_y = 0;
-
-	NeuralNetwork* neuro = nullptr;
 
 };
 

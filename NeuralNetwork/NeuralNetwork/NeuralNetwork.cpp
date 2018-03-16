@@ -49,7 +49,16 @@ float * NeuralNetwork::getData(const string & ID)
 	Layer* layer = this->layers.find(ID)->second;
 	int n = (*layer).getSize();
 
-	return nullptr;
+	if (n == 0)
+		return nullptr;
+	
+	float* mas = new float[n];
+	
+	for (int i = 0; i < n; i++)
+	{
+		mas[i] = layer->getNeuronData(i);
+	}
+	return mas;
 }
 
 void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string& layerID)
@@ -267,9 +276,21 @@ bool NeuralNetwork::setLayerData(float mas[], unsigned int n, const string & ID)
 	}
 }
 
+bool NeuralNetwork::setActivationFunction(const string & ID, float(*f)(float))
+{
+	auto layer = this->layers.find(ID);
+	if (layer != this->layers.end())
+	{
+		(*layer).second->setActivationFunction(f);
+		return 1;
+	}
+	else
+		return 0;
+}
+
 inline bool NeuralNetwork::checkLayerExist(const string&  ID)
 {
-	if (this->layers.find(ID) != this->layers.cend())
+	if (this->layers.find(ID) != this->layers.end())
 		return 1;
 
 	else
