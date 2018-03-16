@@ -60,6 +60,7 @@ public:
 	~NeuralNetwork();
 
 	bool setLayerData(float mas[], unsigned int n, const string& ID);
+	bool setActivationFunction(const string& ID, float(*f)(float));
 
 	float* getData(const string& ID);
 
@@ -86,6 +87,7 @@ public:
 		                         const  string& IDTo,
 		                         const   float& a,
 		                         const   float& b); // adds to layer weights random floats [a..b]
+
 	void mutate(const float &a, const float &b);
 
 	void activateLayer(const string& ID);
