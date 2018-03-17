@@ -37,8 +37,8 @@ int paramToInt(float param)
 Player::Player(int n, int m, int playerID, LifeGame* game)
 {
 	mt19937 gen(unsigned int(time(0)));
-	uniform_int_distribution<int> range_n{ 0,n-1 };
-	uniform_int_distribution<int> range_m{ 0,m-1 };
+	uniform_int_distribution<int> range_n{ 0,n - 1 };
+	uniform_int_distribution<int> range_m{ 0,m - 1 };
 	//default_random_engine re{};
 
 	this->playerID = playerID;
@@ -49,7 +49,7 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->neuro->addLayer(28, "between");
 	this->neuro->addLayer(2, "sigmoid");
 	this->neuro->addLayer(2, "output");
-	
+
 	this->neuro->setActivationFunction("output", partFunction);
 
 	this->neuro->connectLayers("input", "between");
@@ -64,7 +64,7 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->neuro->loadWeightsFromFile(tmpstr + L"input\\input_between_.txt", "input", "between");
 	this->neuro->loadWeightsFromFile(tmpstr + L"between\\between_sigmoid_.txt", "between", "sigmoid");
 	this->neuro->loadWeightsFromFile(tmpstr + L"sigmoid\\sigmoid_output_.txt", "sigmoid", "output");
-	
+
 	this->currGame = game;
 
 	this->pos_x = range_n(gen);
@@ -79,7 +79,6 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	setXY(this->pos_x, this->pos_y, '*', *game);
 }
 
-
 Player::~Player()
 {
 	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
@@ -90,7 +89,6 @@ Player::~Player()
 	this->neuro->saveWeightsToDirectory(tmpstr + L"input", "input", "between");
 	this->neuro->saveWeightsToDirectory(tmpstr + L"between", "between", "sigmoid");
 	this->neuro->saveWeightsToDirectory(tmpstr + L"sigmoid", "sigmoid", "output");
-
 
 	this->neuro->deleteNetworkFiles();
 	delete this->neuro;
@@ -104,6 +102,11 @@ int Player::get_X()
 int Player::get_Y()
 {
 	return this->pos_y;
+}
+
+int Player::getID()
+{
+	return this->playerID;
 }
 
 float Player::getHealth()
@@ -152,5 +155,7 @@ void Player::mutate()
 	this->neuro->randomizeWeights("between", "sigmoid", -0.1f, 0.1f);
 }
 
-
-
+void Player::addHealth(float value)
+{
+	this->health += value;
+}

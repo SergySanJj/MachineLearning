@@ -13,14 +13,14 @@ inline bool checkIn(const string& strIn, const string& str)
 
 inline bool checkForFileName(const string& layerID)
 {
-	return (checkIn(layerID, "." ) &&
-		    checkIn(layerID, "_" ) &&
-		    checkIn(layerID, "/" ) &&
-		    checkIn(layerID, "\\") &&
-		    checkIn(layerID, "?" ) &&
-		    checkIn(layerID, "<" ) &&
-		    checkIn(layerID, ">" ) &&
-		    checkIn(layerID, "*" ));
+	return (checkIn(layerID, ".") &&
+		checkIn(layerID, "_") &&
+		checkIn(layerID, "/") &&
+		checkIn(layerID, "\\") &&
+		checkIn(layerID, "?") &&
+		checkIn(layerID, "<") &&
+		checkIn(layerID, ">") &&
+		checkIn(layerID, "*"));
 }
 
 wstring StringToWString(const string& s)
@@ -51,9 +51,9 @@ float * NeuralNetwork::getData(const string & ID)
 
 	if (n == 0)
 		return nullptr;
-	
+
 	float* mas = new float[n];
-	
+
 	for (int i = 0; i < n; i++)
 	{
 		mas[i] = layer->getNeuronData(i);
@@ -78,7 +78,7 @@ void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string& layerID)
 	else
 	{
 		throw ID_ALREADY_EXISTS; // DO SOMETHING or write catch in wrapper for network class
-		exit( ID_ALREADY_EXISTS );
+		exit(ID_ALREADY_EXISTS);
 	}
 }
 
@@ -90,8 +90,8 @@ bool NeuralNetwork::connectLayers(const string& ID1, const string& ID2)
 
 		wstring pathToWeights = (*(this->layers.find(ID1))).second->getPath();
 
-		pathToWeights += L"\\" + StringToWString(ID1) + 
-			             L"_" + StringToWString(ID2) + L".txt";
+		pathToWeights += L"\\" + StringToWString(ID1) +
+			L"_" + StringToWString(ID2) + L".txt";
 
 		this->fs.createWeightFile(this->layers.find(ID1)->second->getNeurons(), pathToWeights, ID2);
 		return 1;
@@ -101,8 +101,8 @@ bool NeuralNetwork::connectLayers(const string& ID1, const string& ID2)
 }
 
 bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
-	                                    const  string&  IDFrom,
-	                                    const  string&  IDTo)
+	const  string&  IDFrom,
+	const  string&  IDTo)
 {
 	map< string, vector< TEdge* > >* pVectorEdges =
 		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
@@ -112,11 +112,11 @@ bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
 
 	ifstream fin(pathToFile);
 
-	for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin();
-		      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+	for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
+		it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 	{
-		for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin();
-			      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+		for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
+			vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
 		{
 			fin >> (*vIt)->weight;
 		}
@@ -125,29 +125,29 @@ bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
 	return 1;
 }
 
-bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory, 
-	                                       const  string& IDFrom, 
-	                                       const  string& IDTo)
+bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory,
+	const  string& IDFrom,
+	const  string& IDTo)
 {
-	map< string, vector< TEdge* > >* pVectorEdges = 
+	map< string, vector< TEdge* > >* pVectorEdges =
 		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
 
 	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
 		return 0;
 
-	wstring tmpPath = pathToDirectory + L"\\" + 
-		              StringToWString(IDFrom) + L"_" +
-		              StringToWString(IDTo)   + L"_.txt";
+	wstring tmpPath = pathToDirectory + L"\\" +
+		StringToWString(IDFrom) + L"_" +
+		StringToWString(IDTo) + L"_.txt";
 
 	ofstream fout(tmpPath);
 	fout << fixed;
 	fout.precision(11);
 
-	for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin(); 
-		      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+	for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
+		it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 	{
-		for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin(); 
-			      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+		for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
+			vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
 		{
 			fout << (*vIt)->weight << ' ';
 		}
@@ -168,11 +168,11 @@ bool NeuralNetwork::randomizeWeights(const string & IDFrom, const string & IDTo,
 		std::mt19937 mt(rd());
 		std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
 
-		for (auto it  = this->layers.find(IDFrom)->second->getNeurons()->begin();
-			      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+		for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
+			it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 		{
-			for (auto vIt  = (*it).getEdges()->find(IDTo)->second.begin();
-				      vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
+			for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
+				vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
 			{
 				(*vIt)->weight = float(dist(mt));
 			}
@@ -192,7 +192,7 @@ bool NeuralNetwork::addRandomValueToWeights(const string & IDFrom, const string 
 		std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
 
 		for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
-			      it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+			it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
 		{
 			for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
 				vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
@@ -210,17 +210,17 @@ void NeuralNetwork::mutate(const float & a, const float & b)
 	std::mt19937 mt(rd());
 	std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
 
-	for (auto layer  = this->layers.begin();
-		      layer != this->layers.end(); ++layer)
+	for (auto layer = this->layers.begin();
+		layer != this->layers.end(); ++layer)
 	{
-		for (auto neuron  = (*layer).second->getNeurons()->begin();
-			      neuron != (*layer).second->getNeurons()->end(); ++neuron)
+		for (auto neuron = (*layer).second->getNeurons()->begin();
+			neuron != (*layer).second->getNeurons()->end(); ++neuron)
 		{
-			for (auto vEdges  = (*neuron).getEdges()->begin();
-				      vEdges != (*neuron).getEdges()->end(); ++vEdges)
+			for (auto vEdges = (*neuron).getEdges()->begin();
+				vEdges != (*neuron).getEdges()->end(); ++vEdges)
 			{
 				for (auto connection = vEdges->second.begin();
-					      connection != vEdges->second.end(); ++connection)
+					connection != vEdges->second.end(); ++connection)
 				{
 					(*connection)->weight += float(dist(mt));
 				}
@@ -336,8 +336,8 @@ unsigned int Layer::getSize()
 
 void Layer::setActivationFunction(float(*f)(float))
 {
-	for (auto it  = this->neurons->begin(); 
-		      it != this->neurons->end(); ++it)
+	for (auto it = this->neurons->begin();
+		it != this->neurons->end(); ++it)
 	{
 		(*it).setActivationFunction(f);
 	}
@@ -345,8 +345,8 @@ void Layer::setActivationFunction(float(*f)(float))
 
 void Layer::activateFunction()
 {
-	for (auto it  = this->neurons->begin();
-		      it != this->neurons->end(); ++it)
+	for (auto it = this->neurons->begin();
+		it != this->neurons->end(); ++it)
 	{
 		(*it).activateFunction();
 	}
@@ -364,11 +364,11 @@ float Layer::getNeuronData(unsigned int n)
 
 void Layer::linkWithLayer(Layer * linkWith)
 {
-	for (auto layer1  = this->neurons->begin(); 
-		      layer1 != this->neurons->end(); ++layer1)
+	for (auto layer1 = this->neurons->begin();
+		layer1 != this->neurons->end(); ++layer1)
 	{
-		for (auto layer2  = linkWith->neurons->begin();
-			      layer2 != linkWith->neurons->end(); ++layer2)
+		for (auto layer2 = linkWith->neurons->begin();
+			layer2 != linkWith->neurons->end(); ++layer2)
 		{
 			(*layer1).createLink(*layer2, linkWith->getID());
 		}
@@ -380,8 +380,8 @@ void Layer::outputData(const wstring&  pathToFile)
 	ofstream fout(pathToFile);
 	fout << fixed;
 	fout.precision(11);
-	for (auto it  = this->neurons->begin();
-		      it != this->neurons->end(); ++it)
+	for (auto it = this->neurons->begin();
+		it != this->neurons->end(); ++it)
 	{
 		fout << (*it).getData() << '\n';
 	}
@@ -391,8 +391,8 @@ void Layer::outputData(const wstring&  pathToFile)
 
 void Layer::activate()
 {
-	for (auto it  = this->neurons->begin();
-		      it != this->neurons->end(); ++it)
+	for (auto it = this->neurons->begin();
+		it != this->neurons->end(); ++it)
 	{
 		(*it).activate();
 	}
@@ -400,8 +400,8 @@ void Layer::activate()
 
 void Layer::clearData()
 {
-	for (auto neurons  = this->neurons->begin();
-		      neurons != this->neurons->end(); ++neurons)
+	for (auto neurons = this->neurons->begin();
+		neurons != this->neurons->end(); ++neurons)
 	{
 		(*neurons).setInput(0.0f);
 	}

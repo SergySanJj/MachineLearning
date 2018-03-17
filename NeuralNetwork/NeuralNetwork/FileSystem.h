@@ -30,13 +30,13 @@ public:
 	wstring getCurDir();                                 // Returns current directory path.
 
 	wstring organizeLayer(const string& networkName,
-		                  const string& layerID);        // Returns path to layer dir.
+		const string& layerID);        // Returns path to layer dir.
 
 	void organizeNetwork(const string& networkName);     // Creates directory in current directory with network name.
 
 	void createWeightFile(vector<Neuron>* neurons,       // Creates file with weights of neurons.
-		                  const wstring&  path,            
-		                  const string&   connectedWith);
+		const wstring&  path,
+		const string&   connectedWith);
 
 	void deleteNetwork();
 

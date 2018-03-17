@@ -6,6 +6,9 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <ctime>
+#include <Windows.h>
+#include <random>
 
 using namespace std;
 
@@ -14,7 +17,6 @@ using namespace std;
 	*  used for player field
 	+  used for food field
 */
-
 
 #define INFOSIZE 5     // Player info vector size
 #define MAXSTEPS 10000 // maximum number of steps in each game
@@ -43,6 +45,7 @@ public:
 	char getXY(int X, int Y);
 
 	void printField();
+	void clearField();
 private:
 	int _n = 1;
 	int _m = 1;
@@ -75,25 +78,30 @@ public:
 	LifeGame(int n, int m, int numberOfPlayers);
 	~LifeGame();
 
-
-	void step();
-
+	void setPause(unsigned int time_);
 	char getXY(int X, int Y);
 	bool checkMove(int new_x, int new_y);
+
+	void step();
+	void play();
 	void printField();
-	float* formInputVector(Player* formFor);
+	
 private:
 	int _n = 1;
 	int _m = 1;
 	unsigned int _step = 0;
+	unsigned int _pause = 100;
 	Field* _field = nullptr;
 	vector<Player*> players;
 	vector<deadPlayer*> deadPlayers;
 	vector<Food*> food;
 
-
 	friend void setXY(int X, int Y, char symbol, LifeGame&);
 	friend void movePlayer(int pl_x, int pl_y, int new_x, int new_y, LifeGame&);
+	void generateFood();
+	void assigneCells();
+
+	float* formInputVector(Player* formFor);
 };
 
 #endif // !LifeGame_H_
