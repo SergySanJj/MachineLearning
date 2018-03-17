@@ -18,11 +18,10 @@ using namespace std;
 
 /// COMMANDS ///
 
-
 class NeuralNetwork;
 class LifeGame;
 
-class Player 
+class Player
 {
 public:
 	Player(int n, int m, int playerID, LifeGame* game);
@@ -32,11 +31,12 @@ public:
 
 	int get_X();
 	int get_Y();
+	int getID();
 	float getHealth();
 	void clearNeuroData();
 	void activateNeuro(float* input);
 	void mutate();
-
+	void addHealth(float value);
 	//pair<int,int> step(float* inputData); // returns pair with new coordinates
 
 private:
@@ -48,7 +48,6 @@ private:
 
 	int pos_x = 0;
 	int pos_y = 0;
-
 };
 
 #endif // !Player_H_

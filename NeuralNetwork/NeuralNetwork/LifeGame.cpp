@@ -1,12 +1,10 @@
 #include "LifeGame.h"
 #include "Player.h"
 
-
 int getMax(int a, int b)
 {
 	return ((a > b) ? a : b);
 }
-
 
 ////////////////////////////////////////////////////////////////////
 
@@ -18,92 +16,139 @@ LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
 		Player* tmpPlayer = new Player(n, m, i, this);
 		this->players.push_back(tmpPlayer);
 	}
-		
 }
-
 
 LifeGame::~LifeGame()
 {
-	for (auto it  = this->players.begin();
-		      it != this->players.end()  ; ++it)
+	for (auto it = this->players.begin();
+		it != this->players.end(); ++it)
 	{
 		delete (&(*(*it)));
 	}
 }
 
+void LifeGame::setPause(unsigned int time_)
+{
+	this->_pause = time_;
+}
+
 void LifeGame::step()
 {
-	// if any player alive
-	while ((this->players.size() != 0) && (this->_step < MAXSTEPS))
+	for (auto it = this->players.begin(); it != this->players.end(); ++it)
 	{
-		vector<stepNode> stepNodes;
-		for (auto it = this->players.begin(); it != this->players.end(); ++it)
-		{
-			float* params = formInputVector((*it));
-			(*it)->activateNeuro(params);
+		float* params = formInputVector((*it));
+		(*it)->activateNeuro(params);
 
-			delete params;
-		}
-		//form input vector for each player
-		//get output decisions from each
-		//write into stepNodes \|/
-		for (auto it = this->players.begin();
-			it != this->players.end(); ++it)
+		delete params;
+	}
+	//check on repeats in pair of coords
+		//if so - >
+			// kill player with lesser health
+	for (int i = 0; i < this->players.size(); i++)
+	{
+		for (int k = i + 1; k < this->players.size(); k++)
 		{
-			stepNode tmpNode;
-			tmpNode._player = (&*(*it));
-			tmpNode._x = tmpNode._player->get_X();
-			tmpNode._y = tmpNode._player->get_Y();
-			stepNodes.push_back(tmpNode);
-		}
-		//check on repeats in pair of coords
-			//if so - > 
-				// kill player with lesser health
-		for (int i = 0; i < this->players.size(); i++)
-		{
-			for (int k = i + 1; k < this->players.size(); k++)
+			if (this->players[i]->get_X() == this->players[k]->get_X() &&
+				this->players[i]->get_Y() == this->players[k]->get_Y())
 			{
-				if (this->players[i]->get_X() == this->players[k]->get_X() &&
-					this->players[i]->get_Y() == this->players[k]->get_Y())
+				if (this->players[i]->getHealth() >= this->players[k]->getHealth())
 				{
-					if (this->players[i]->getHealth() >= this->players[k]->getHealth()) 
+					bool alreadyExists = 0;
+					for (auto dead = this->deadPlayers.begin(); dead != this->deadPlayers.end(); ++dead)
 					{
-						bool alreadyExists = 0;
-						for (auto dead = this->deadPlayers.begin(); dead != this->deadPlayers.end(); ++dead)
-						{
-							if ((*dead)->_player == this->players[k])
-								alreadyExists = 1;
-						}
-						if (!alreadyExists)
-						{
-							deadPlayer* tmpDead = new deadPlayer();
-							tmpDead->_player = this->players[k];
-							tmpDead->lastStep = this->_step;
+						if ((*dead)->_player == this->players[k])
+							alreadyExists = 1;
+					}
+					if (!alreadyExists)
+					{
+						deadPlayer* tmpDead = new deadPlayer();
+						tmpDead->_player = this->players[k];
+						tmpDead->lastStep = this->_step;
 
-							this->deadPlayers.push_back(tmpDead);
-						}
-	
-						
+						this->deadPlayers.push_back(tmpDead);
 					}
 				}
 			}
 		}
-
-		for (int i = 0; i < this->players.size(); i++) /// HERE HERE HEREHERE HERE HERE!!!
-		{
-			this->players.
-		}
-		// if alive player stays on food cell health++
-		// every player health --
-		// check if dead 
-		// put all dead players into vector of dead with mark of current step number
-		// currNumber++
-		// generate new food
-		// Go to beginning 
 	}
-	//else
-		// return results to wrapper function
+	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
+	{
+		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
+		if (tmp != this->players.end())
+			tmp = this->players.erase(tmp);
+	}
+
+	// if alive player stays on food cell health++
+	for (auto pl = this->players.begin(); pl != this->players.end(); ++pl) // S(0)
+	{
+		for (auto fd = this->food.begin(); fd != this->food.end(); ++fd)
+		{
+			if ((*pl)->get_X() == (*fd)->pos_x)
+			{
+				if ((*pl)->get_Y() == (*fd)->pos_y)
+				{
+					(*pl)->addHealth(FOODVALUE);
+					delete (*fd);
+					fd = this->food.erase(fd);
+
+					break; // moves to next iteration of S(0) after decreasing
+				}
+			}
+		}
+		// every player health --
+		(*pl)->addHealth(-5.0f);
+		// check if dead
+		// put all dead players into vector of dead with mark of current step number
+		if ((*pl)->getHealth() <= 0)
+		{
+			deadPlayer* tmpDead = new deadPlayer();
+			tmpDead->_player = (*pl);
+			tmpDead->lastStep = this->_step;
+
+			this->deadPlayers.push_back(tmpDead);
+		}
+	}
+
+	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
+	{
+		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
+		if (tmp != this->players.end())
+			tmp = this->players.erase(tmp);
+	}
+
+	this->_field->clearField(); // make all cells '_' then we will rewrite every symbol
+
+	// Reassigne field symbols
+	assigneCells();
+
+	// generate new food
+	int foodMax = (this->_m * this->_n) / 10;
+	while (this->food.size() < foodMax)
+	{
+		generateFood();
+	}
+
 	this->_step++;
+
+	system("cls");
+
+	this->_field->printField();
+	Sleep(this->_pause);
+	// Go to beginning
+}
+
+void LifeGame::play()
+{
+	while (this->players.size() != 0 && this->_step < MAXSTEPS)
+	{
+		step();
+	}
+	system("cls");
+	cout << '\n' << "     *Results*\n";
+	for (int i = 0; i < this->deadPlayers.size(); i++)
+	{
+		cout << " player_" << this->deadPlayers[i]->_player->getID() << "  " << this->deadPlayers[i]->lastStep << "\n";
+	}
 }
 
 char LifeGame::getXY(int X, int Y)
@@ -120,7 +165,6 @@ bool LifeGame::checkMove(int new_x, int new_y)
 	}
 	return 0;
 }
-
 
 void LifeGame::printField()
 {
@@ -147,8 +191,8 @@ float * LifeGame::formInputVector(Player * formFor)
 		{
 			if ((*it) != formFor)
 			{
-				int tmp = getMax(abs(formFor->get_X()- (*it)->get_X()),
-					             abs(formFor->get_Y() - (*it)->get_Y()));
+				int tmp = getMax(abs(formFor->get_X() - (*it)->get_X()),
+					abs(formFor->get_Y() - (*it)->get_Y()));
 				if (etalonLen > tmp)
 				{
 					etalonLen = tmp;
@@ -168,27 +212,66 @@ float * LifeGame::formInputVector(Player * formFor)
 	for (auto it = this->food.begin(); it != this->food.end(); ++it)
 	{
 		int tmp = getMax(abs(formFor->get_X() - (*it)->pos_x),
-			             abs(formFor->get_Y() - (*it)->pos_y));
+			abs(formFor->get_Y() - (*it)->pos_y));
 		if (etalonLen > tmp)
 		{
 			etalonLen = tmp;
 			etalonFood = (*it);
 		}
 	}
-	mas[4] = float(etalonFood->pos_x);
-	mas[5] = float(etalonFood->pos_y);
+	if (etalonFood == nullptr)
+	{
+		mas[4] = MAXLEN;
+		mas[5] = MAXLEN;
+	}
+	else
+	{
+		mas[4] = float(etalonFood->pos_x);
+		mas[5] = float(etalonFood->pos_y);
+	}
 
 	return mas;
 }
 
+void LifeGame::generateFood()
+{
+	mt19937 gen(unsigned int(time(0)));
+	uniform_int_distribution<int> range_n{ 0,this->_n - 1 };
+	uniform_int_distribution<int> range_m{ 0,this->_m - 1 };
+
+	int tmp_x = range_n(gen);
+	int tmp_y = range_m(gen);
+	while (this->_field->getXY(tmp_x, tmp_y) != '_')
+	{
+		tmp_x = range_n(gen);
+		tmp_y = range_m(gen);
+	}
+	Food* tmpFood = new Food();
+	tmpFood->pos_x = tmp_x;
+	tmpFood->pos_y = tmp_y;
+	this->food.push_back(tmpFood);
+	this->_field->setXY(tmp_x, tmp_y, '+');
+}
+
+void LifeGame::assigneCells()
+{
+	for (auto pl = this->players.begin(); pl != this->players.end(); ++pl)
+	{
+		this->_field->setXY((*pl)->get_X(), (*pl)->get_Y(), '*');
+	}
+	for (auto fd = this->food.begin(); fd != this->food.end(); ++fd)
+	{
+		this->_field->setXY((*fd)->pos_x, (*fd)->pos_y, '+');
+	}
+}
 
 Field::Field(int n, int m) :_n(n), _m(m)
 {
-	this->_field = new char* [n];
+	this->_field = new char*[n];
 	for (int i = 0; i < n; i++)
 	{
 		this->_field[i] = new char[m];
-		for (int k=0;k<m;k++)
+		for (int k = 0; k < m; k++)
 			this->_field[i][k] = '_';
 	}
 }
@@ -213,8 +296,6 @@ char Field::getXY(int X, int Y)
 	return (this->_field[X][Y]);
 }
 
-
-
 void Field::printField()
 {
 	for (int i = 0; i < this->_n; i++)
@@ -222,6 +303,17 @@ void Field::printField()
 		for (int k = 0; k < this->_m; k++)
 			cout << this->_field[i][k] << ' ';
 		cout << '\n';
+	}
+}
+
+void Field::clearField()
+{
+	for (int i = 0; i < this->_n; i++)
+	{
+		for (int j = 0; j < this->_m; j++)
+		{
+			this->_field[i][j] = '_';
+		}
 	}
 }
 
@@ -234,5 +326,3 @@ void movePlayer(int pl_x, int pl_y, int new_x, int new_y, LifeGame& game)
 {
 	game._field->setXY(pl_x, pl_y, '_');
 }
-
-

@@ -76,7 +76,6 @@ string wstrtTostr(const wstring &ws)
 	return converter.to_bytes(ws);
 }
 
-
 //////////////////////** FileSystem **//////////////////////
 FileSystem::FileSystem()
 {
@@ -97,7 +96,7 @@ wstring FileSystem::getCurDir()
 }
 
 wstring FileSystem::organizeLayer(const string& networkName,
-	                              const string& layerID)
+	const string& layerID)
 {
 	return createLayerDir(strToWstr(layerID));
 }
@@ -108,17 +107,17 @@ void FileSystem::organizeNetwork(const string& networkName)
 }
 
 void FileSystem::createWeightFile(vector<Neuron>* neurons,
-	                              const wstring&  path,
-	                              const  string&  connectedWith)
+	const wstring&  path,
+	const  string&  connectedWith)
 {
 	ofstream fout(path);
 	fout << fixed;
 	fout.precision(11);
-	for (auto it  = neurons->begin();
-		      it != neurons->end(); ++it)
+	for (auto it = neurons->begin();
+		it != neurons->end(); ++it)
 	{
-		for (auto vIt  = it->getEdges()->find(connectedWith)->second.begin();
-			      vIt != it->getEdges()->find(connectedWith)->second.end(); ++vIt)
+		for (auto vIt = it->getEdges()->find(connectedWith)->second.begin();
+			vIt != it->getEdges()->find(connectedWith)->second.end(); ++vIt)
 		{
 			fout << (*vIt)->weight << ' ';
 		}

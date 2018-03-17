@@ -65,28 +65,28 @@ public:
 	float* getData(const string& ID);
 
 	void addLayer(unsigned int  neuronQuantity,
-		          const string& layerID);
+		const string& layerID);
 
 	bool connectLayers(const string& ID1,
-		               const string& ID2);
+		const string& ID2);
 
 	bool loadWeightsFromFile(const wstring& pathToFile,
-		                     const  string& IDFrom,
-		                     const  string& IDTo);
+		const  string& IDFrom,
+		const  string& IDTo);
 
 	bool saveWeightsToDirectory(const wstring& pathToDirectory,
-		                        const  string& IDFrom,
-		                        const  string& IDTo);
+		const  string& IDFrom,
+		const  string& IDTo);
 
-	bool randomizeWeights(const  string& IDFrom, 
-		                  const  string& IDTo,
-		                  const   float& a,
-		                  const   float& b); // set layer weights to random [a..b]
+	bool randomizeWeights(const  string& IDFrom,
+		const  string& IDTo,
+		const   float& a,
+		const   float& b); // set layer weights to random [a..b]
 
 	bool addRandomValueToWeights(const  string& IDFrom,
-		                         const  string& IDTo,
-		                         const   float& a,
-		                         const   float& b); // adds to layer weights random floats [a..b]
+		const  string& IDTo,
+		const   float& a,
+		const   float& b); // adds to layer weights random floats [a..b]
 
 	void mutate(const float &a, const float &b);
 
@@ -109,7 +109,5 @@ private:
 };
 
 //////////////////** templates **///////////////////////////
-
-
 
 #endif // NeuralNetwork_H_ 
