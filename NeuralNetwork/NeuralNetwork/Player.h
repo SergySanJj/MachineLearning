@@ -29,17 +29,6 @@ public:
 	~Player();
 
 	NeuralNetwork * neuro = nullptr;
-	/*
-	Player& operator = (const Player& right) // not an = operator in common thought, here it just copy NN
-	{
-		if (this == &right)
-		{
-			return *this;
-		}
-		delete this->neuro;
-		this->neuro = right.neuro;
-		return *this;
-	}*/
 
 	int get_X();
 	int get_Y();
@@ -51,7 +40,6 @@ public:
 	void mutate();
 	void addHealth(float value);
 	void saveWeights();
-	//pair<int,int> step(float* inputData); // returns pair with new coordinates
 
 private:
 	int playerID = 0;

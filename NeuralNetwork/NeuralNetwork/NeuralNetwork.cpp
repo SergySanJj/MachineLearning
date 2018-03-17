@@ -272,8 +272,8 @@ bool NeuralNetwork::clearLayerData(const string & ID)
 
 void NeuralNetwork::deleteNetworkFiles()
 {
-	if (this->_echo == 1)
-		this->fs.deleteNetwork();
+
+	this->fs.deleteNetwork();
 }
 
 void NeuralNetwork::echo(bool value)

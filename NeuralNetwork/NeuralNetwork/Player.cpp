@@ -131,18 +131,16 @@ Player::~Player()
 	savesPath += to_string(this->playerID) + "\\";
 
 	wstring tmpstr(savesPath.begin(), savesPath.end());
-
-	this->neuro->saveWeightsToDirectory(tmpstr + L"input", "input", "between");
-	this->neuro->saveWeightsToDirectory(tmpstr + L"between", "between", "sigmoid");
-	this->neuro->saveWeightsToDirectory(tmpstr + L"sigmoid", "sigmoid", "output");
-
 	if (this->neuro != nullptr)
 	{
+		this->neuro->saveWeightsToDirectory(tmpstr + L"input", "input", "between");
+		this->neuro->saveWeightsToDirectory(tmpstr + L"between", "between", "sigmoid");
+		this->neuro->saveWeightsToDirectory(tmpstr + L"sigmoid", "sigmoid", "output");
+
 		this->neuro->deleteNetworkFiles();
-		delete this->neuro;
-	}
-		
+	}		
 }
+
 
 int Player::get_X()
 {
@@ -164,13 +162,15 @@ float Player::getHealth()
 	return this->health;
 }
 
-void Player::copyNeuro(const Player & right)
+void Player::copyNeuro(const Player& right)
 {
 	if (this == &right)
 	{
 		return;
 	}
+	this->neuro->deleteNetworkFiles();
 	delete this->neuro;
+
 	this->neuro = right.neuro;
 }
 

@@ -36,18 +36,41 @@ LifeGame::LifeGame(int n, int m, int numberOfPlayers, bool echo)
 
 LifeGame::~LifeGame()
 {
+	vector<NeuralNetwork*> neurals;
+
 	for (auto it = this->players.begin();
 		it != this->players.end(); ++it)
 	{
+
 		if (*it != nullptr)
+		{
+			NeuralNetwork* tmp = (*it)->neuro;
+			if (find(neurals.begin(), neurals.end(), tmp) == neurals.end())
+			{
+				neurals.push_back(tmp);
+			}
 			delete (*it);
+		}
 	}
 	for (auto it = this->deadPlayers.begin();
 		it != this->deadPlayers.end(); ++it)
 	{
 		if ((*it)->_player != nullptr)
+		{
+			NeuralNetwork* tmp = (*it)->_player->neuro;
+			if (find(neurals.begin(), neurals.end(), tmp) == neurals.end())
+			{
+				neurals.push_back(tmp);
+			}
 			delete (*it)->_player;
+		}
 	}
+
+	for (auto neural = neurals.begin(); neural != neurals.end(); ++neural)
+	{
+		delete (*neural);
+	}
+
 	for (auto it = this->food.begin();
 		it != this->food.end(); ++it)
 	{
