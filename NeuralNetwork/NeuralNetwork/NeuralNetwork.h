@@ -57,8 +57,10 @@ class NeuralNetwork
 {
 public:
 	NeuralNetwork(const string& name);
+	NeuralNetwork(const string& name, bool echo);
 	~NeuralNetwork();
 
+	void echo(bool value);
 	bool setLayerData(float mas[], unsigned int n, const string& ID);
 	bool setActivationFunction(const string& ID, float(*f)(float));
 
@@ -104,6 +106,7 @@ private:
 	unordered_map<string, Layer*> layers; // key, point to the layer of nodes
 	string networkName = "a";
 	FileSystem fs;
+	bool _echo = 1; // 1 - create directory&files 0 - do not
 
 	inline bool checkLayerExist(const string& ID);
 };

@@ -9,11 +9,15 @@ using namespace std;
 
 int main()
 {
-	LifeGame ldf(10, 10, 10);
-	ldf.setPause(100);
-	ldf.printField();
-	ldf.play();
-	system("pause");
+	for (int i = 0; i < 50; i++)
+	{
+		LifeGame* ldf = new LifeGame(30, 30, 10);
+		ldf->setPause(100);
+		//ldf->echo(0);
+		ldf->play();
+		delete ldf;
+	}
+	//system("pause");
 	return 0;
 }
 

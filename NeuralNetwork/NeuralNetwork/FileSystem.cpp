@@ -27,7 +27,11 @@ int DeleteDirectory(const string& pathToDelDir, bool bDeleteSubdirectories = 1)
 						// Delete subdirectory.
 						int iRC = DeleteDirectory(strFilePath, bDeleteSubdirectories);
 						if (iRC)
+						{
+							//::FindClose(hFile);
 							return iRC;
+						}
+							
 					}
 					else
 						bSubdirectory = true;

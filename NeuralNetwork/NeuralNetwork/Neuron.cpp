@@ -14,6 +14,14 @@ Neuron::Neuron()
 
 Neuron::~Neuron()
 {
+	for (auto layerIt = this->edges.begin(); layerIt != this->edges.end(); ++layerIt)
+	{
+		for (auto vEdges = layerIt->second.begin(); vEdges != layerIt->second.end(); ++vEdges)
+		{
+			delete *vEdges;
+			*vEdges = nullptr;
+		}
+	}
 	this->edges.clear();
 }
 
