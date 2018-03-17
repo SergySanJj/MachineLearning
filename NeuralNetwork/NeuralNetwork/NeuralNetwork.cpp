@@ -33,7 +33,15 @@ wstring StringToWString(const string& s)
 
 NeuralNetwork::NeuralNetwork(const string& name) :networkName(name)
 {
-	this->fs.organizeNetwork(name);
+	if(this->_echo == 1)
+		this->fs.organizeNetwork(name);
+}
+
+NeuralNetwork::NeuralNetwork(const string & name, bool echo) :networkName(name)
+{
+	this->_echo = echo;
+	if (this->_echo == 1)
+		this->fs.organizeNetwork(name);
 }
 
 NeuralNetwork::~NeuralNetwork()
@@ -73,7 +81,9 @@ void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string& layerID)
 		Layer * newLayer = new Layer(neuronQuantity, layerID);
 		newLayer->setNetworkName(this->networkName);
 		this->layers.insert(layerPair(layerID, newLayer));
-		newLayer->setPath(this->fs.organizeLayer(this->networkName, layerID));
+
+		if(this->_echo == 1)
+			newLayer->setPath(this->fs.organizeLayer(this->networkName, layerID));
 	}
 	else
 	{
@@ -92,8 +102,8 @@ bool NeuralNetwork::connectLayers(const string& ID1, const string& ID2)
 
 		pathToWeights += L"\\" + StringToWString(ID1) +
 			L"_" + StringToWString(ID2) + L".txt";
-
-		this->fs.createWeightFile(this->layers.find(ID1)->second->getNeurons(), pathToWeights, ID2);
+		if (this->_echo == 1)
+			this->fs.createWeightFile(this->layers.find(ID1)->second->getNeurons(), pathToWeights, ID2);
 		return 1;
 	}
 	else
@@ -104,16 +114,18 @@ bool NeuralNetwork::loadWeightsFromFile(const wstring&  pathToFile,
 	const  string&  IDFrom,
 	const  string&  IDTo)
 {
+	auto idFromNeurons = this->layers.find(IDFrom)->second->getNeurons();
+
 	map< string, vector< TEdge* > >* pVectorEdges =
-		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+		idFromNeurons->begin()->getEdges();
 
 	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
 		return 0;
 
 	ifstream fin(pathToFile);
 
-	for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
-		it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+	for (auto it  = idFromNeurons->begin();
+		      it != idFromNeurons->end(); ++it)
 	{
 		for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
 			vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
@@ -129,8 +141,10 @@ bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory,
 	const  string& IDFrom,
 	const  string& IDTo)
 {
+	auto idFromNeurons = this->layers.find(IDFrom)->second->getNeurons();
+
 	map< string, vector< TEdge* > >* pVectorEdges =
-		this->layers.find(IDFrom)->second->getNeurons()->begin()->getEdges();
+		idFromNeurons->begin()->getEdges();
 
 	if (pVectorEdges->find(IDTo) == pVectorEdges->end())
 		return 0;
@@ -143,8 +157,8 @@ bool NeuralNetwork::saveWeightsToDirectory(const wstring& pathToDirectory,
 	fout << fixed;
 	fout.precision(11);
 
-	for (auto it = this->layers.find(IDFrom)->second->getNeurons()->begin();
-		it != this->layers.find(IDFrom)->second->getNeurons()->end(); ++it)
+	for (auto it = idFromNeurons->begin();
+		it != idFromNeurons->end(); ++it)
 	{
 		for (auto vIt = (*it).getEdges()->find(IDTo)->second.begin();
 			vIt != (*it).getEdges()->find(IDTo)->second.end(); ++vIt)
@@ -258,7 +272,13 @@ bool NeuralNetwork::clearLayerData(const string & ID)
 
 void NeuralNetwork::deleteNetworkFiles()
 {
+
 	this->fs.deleteNetwork();
+}
+
+void NeuralNetwork::echo(bool value)
+{
+	this->_echo = value;
 }
 
 bool NeuralNetwork::setLayerData(float mas[], unsigned int n, const string & ID)
@@ -400,10 +420,10 @@ void Layer::activate()
 
 void Layer::clearData()
 {
-	for (auto neurons = this->neurons->begin();
-		neurons != this->neurons->end(); ++neurons)
+	for (auto neurons__ = this->neurons->begin();
+		neurons__ != this->neurons->end(); ++neurons__)
 	{
-		(*neurons).setInput(0.0f);
+		(*neurons__).setInput(0.0f);
 	}
 }
 

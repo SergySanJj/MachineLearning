@@ -25,6 +25,7 @@ class Player
 {
 public:
 	Player(int n, int m, int playerID, LifeGame* game);
+	Player(int n, int m, int playerID, LifeGame* game, bool echo);
 	~Player();
 
 	NeuralNetwork * neuro = nullptr;
@@ -33,15 +34,16 @@ public:
 	int get_Y();
 	int getID();
 	float getHealth();
+	void copyNeuro(const Player& right);
 	void clearNeuroData();
 	void activateNeuro(float* input);
 	void mutate();
 	void addHealth(float value);
-	//pair<int,int> step(float* inputData); // returns pair with new coordinates
+	void saveWeights();
 
 private:
 	int playerID = 0;
-
+	bool _echo = 1;
 	float health = DEFAULTHEALTH;
 
 	LifeGame* currGame = nullptr;

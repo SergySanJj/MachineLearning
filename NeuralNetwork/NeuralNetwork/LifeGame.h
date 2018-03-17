@@ -9,6 +9,7 @@
 #include <ctime>
 #include <Windows.h>
 #include <random>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ using namespace std;
 #define MAXSTEPS 10000 // maximum number of steps in each game
 #define FOODVALUE 20
 #define MAXLEN 10000.0f // max coord of vector to enemy (etalon)
+#define PAUSE_BETWEEN_GAMES 10
 
 class Player;
 
@@ -76,21 +78,26 @@ class LifeGame
 {
 public:
 	LifeGame(int n, int m, int numberOfPlayers);
+	LifeGame(int n, int m, int numberOfPlayers, bool echo);
 	~LifeGame();
 
 	void setPause(unsigned int time_);
+	void echo(bool value); // 1 - print 0 - don't print
 	char getXY(int X, int Y);
 	bool checkMove(int new_x, int new_y);
 
 	void step();
 	void play();
+	void teach();
 	void printField();
 	
 private:
 	int _n = 1;
 	int _m = 1;
 	unsigned int _step = 0;
+	unsigned int _evolution = 0;
 	unsigned int _pause = 100;
+	bool _echo = 1;
 	Field* _field = nullptr;
 	vector<Player*> players;
 	vector<deadPlayer*> deadPlayers;

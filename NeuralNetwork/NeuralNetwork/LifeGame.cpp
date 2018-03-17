@@ -6,6 +6,11 @@ int getMax(int a, int b)
 	return ((a > b) ? a : b);
 }
 
+bool cmpDead(const deadPlayer* a, const deadPlayer* b)
+{
+	return (a->lastStep > b->lastStep);
+}
+
 ////////////////////////////////////////////////////////////////////
 
 LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
@@ -18,18 +23,70 @@ LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
 	}
 }
 
+LifeGame::LifeGame(int n, int m, int numberOfPlayers, bool echo)
+{
+	this->_echo = echo;
+	this->_field = new Field(n, m);
+	for (int i = 0; i < numberOfPlayers; i++)
+	{
+		Player* tmpPlayer = new Player(n, m, i, this);
+		this->players.push_back(tmpPlayer);
+	}
+}
+
 LifeGame::~LifeGame()
 {
+	vector<NeuralNetwork*> neurals;
+
 	for (auto it = this->players.begin();
 		it != this->players.end(); ++it)
 	{
-		delete (&(*(*it)));
+
+		if (*it != nullptr)
+		{
+			NeuralNetwork* tmp = (*it)->neuro;
+			if (find(neurals.begin(), neurals.end(), tmp) == neurals.end())
+			{
+				neurals.push_back(tmp);
+			}
+			delete (*it);
+		}
+	}
+	for (auto it = this->deadPlayers.begin();
+		it != this->deadPlayers.end(); ++it)
+	{
+		if ((*it)->_player != nullptr)
+		{
+			NeuralNetwork* tmp = (*it)->_player->neuro;
+			if (find(neurals.begin(), neurals.end(), tmp) == neurals.end())
+			{
+				neurals.push_back(tmp);
+			}
+			delete (*it)->_player;
+		}
+	}
+
+	for (auto neural = neurals.begin(); neural != neurals.end(); ++neural)
+	{
+		delete (*neural);
+	}
+
+	for (auto it = this->food.begin();
+		it != this->food.end(); ++it)
+	{
+		if (*it != nullptr)
+			delete (*it);
 	}
 }
 
 void LifeGame::setPause(unsigned int time_)
 {
 	this->_pause = time_;
+}
+
+void LifeGame::echo(bool value)
+{
+	this->_echo = value;
 }
 
 void LifeGame::step()
@@ -39,7 +96,7 @@ void LifeGame::step()
 		float* params = formInputVector((*it));
 		(*it)->activateNeuro(params);
 
-		delete params;
+		delete[] params;
 	}
 	//check on repeats in pair of coords
 		//if so - >
@@ -48,8 +105,10 @@ void LifeGame::step()
 	{
 		for (int k = i + 1; k < this->players.size(); k++)
 		{
-			if (this->players[i]->get_X() == this->players[k]->get_X() &&
-				this->players[i]->get_Y() == this->players[k]->get_Y())
+			Player* iPlayer = this->players[i];
+			Player* kPlayer = this->players[k];
+			if (iPlayer->get_X() == kPlayer->get_X() &&
+				iPlayer->get_Y() == kPlayer->get_Y())
 			{
 				if (this->players[i]->getHealth() >= this->players[k]->getHealth())
 				{
@@ -71,6 +130,7 @@ void LifeGame::step()
 			}
 		}
 	}
+
 	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
 	{
 		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
@@ -130,10 +190,12 @@ void LifeGame::step()
 
 	this->_step++;
 
-	system("cls");
-
-	this->_field->printField();
-	Sleep(this->_pause);
+	if (_echo == 1)
+	{
+		system("cls");
+		this->_field->printField();
+		Sleep(this->_pause);
+	}
 	// Go to beginning
 }
 
@@ -148,6 +210,28 @@ void LifeGame::play()
 	for (int i = 0; i < this->deadPlayers.size(); i++)
 	{
 		cout << " player_" << this->deadPlayers[i]->_player->getID() << "  " << this->deadPlayers[i]->lastStep << "\n";
+	}
+	cout << "evolution #" << this->_evolution << "\n";
+	Sleep(PAUSE_BETWEEN_GAMES);
+	this->_evolution++;
+	teach();
+
+	for (int i = 0; i < 10; i++)
+	{
+		this->deadPlayers[i]->_player->saveWeights();
+	}
+}
+
+void LifeGame::teach()
+{
+	//sort(this->deadPlayers.begin(), this->deadPlayers.end(), cmpDead);
+	for (int i = 3; i < 7; i++)
+	{
+		this->deadPlayers[i]->_player->mutate();
+	}
+	for (int i = 7; i < 9; i++)
+	{
+		this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
 	}
 }
 
@@ -200,8 +284,8 @@ float * LifeGame::formInputVector(Player * formFor)
 				}
 			}
 		}
-		mas[1] = float(etalonPlayer->get_X());
-		mas[2] = float(etalonPlayer->get_Y());
+		mas[1] = float(etalonPlayer->get_X() - formFor->get_X());
+		mas[2] = float(etalonPlayer->get_Y() - formFor->get_Y());
 		mas[3] = float(etalonPlayer->getHealth());
 	}
 
@@ -226,8 +310,8 @@ float * LifeGame::formInputVector(Player * formFor)
 	}
 	else
 	{
-		mas[4] = float(etalonFood->pos_x);
-		mas[5] = float(etalonFood->pos_y);
+		mas[4] = float(etalonFood->pos_x - formFor->get_X());
+		mas[5] = float(etalonFood->pos_y - formFor->get_Y());
 	}
 
 	return mas;
@@ -280,9 +364,9 @@ Field::~Field()
 {
 	for (int i = 0; i < this->_n; i++)
 	{
-		delete (this->_field[i]);
+		delete[] (this->_field[i]);
 	}
-	delete (this->_field);
+	delete[] (this->_field);
 }
 
 void Field::setXY(int X, int Y, char symbol)
