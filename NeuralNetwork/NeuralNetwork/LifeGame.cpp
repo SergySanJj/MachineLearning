@@ -89,7 +89,8 @@ void LifeGame::initializeAllWithRnd(float a, float b)
 	for (auto it = this->players.begin(); it != this->players.end(); ++it)
 	{
 		(*it)->neuro->setLayerWeights("input", 0.0f);
-		(*it)->neuro->setLayerWeights("between", 0.0f);
+		(*it)->neuro->setLayerWeights("between1", 0.0f);
+		(*it)->neuro->setLayerWeights("between2", 0.0f);
 		(*it)->mutate(a, b);
 	}
 }
@@ -97,6 +98,11 @@ void LifeGame::initializeAllWithRnd(float a, float b)
 void LifeGame::echo(bool value)
 {
 	this->_echo = value;
+}
+
+void LifeGame::echoPrint(bool value)
+{
+	this->_echoPrint = value;
 }
 
 void LifeGame::step()
@@ -219,7 +225,7 @@ void LifeGame::step()
 
 	this->_step++;
 
-	if (_echo == 1)
+	if (_echoPrint == 1)
 	{
 		system("cls");
 		this->_field->printField();
@@ -242,7 +248,8 @@ void LifeGame::play()
 		cout << " player_" << tmp->_player->getID() << "  " << tmp->lastStep << "\n";
 	}
 	cout << "evolution #" << this->_evolution << "\n";
-	Sleep(PAUSE_BETWEEN_GAMES);
+	if (this->_pause > 0)
+		Sleep(PAUSE_BETWEEN_GAMES * this->_pause);
 	this->_evolution++;
 	teach();
 
@@ -262,7 +269,8 @@ void LifeGame::teach()
 	{
 		//this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
 		this->deadPlayers[i]->_player->neuro->crossLayers("input", *this->deadPlayers[i - 7]->_player->neuro->getLayer("input"), 1);
-		this->deadPlayers[i]->_player->neuro->crossLayers("between", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between"), 10);
+		this->deadPlayers[i]->_player->neuro->crossLayers("between1", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between1"), 30);
+		this->deadPlayers[i]->_player->neuro->crossLayers("between2", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between2"), 10);
 	}
 }
 

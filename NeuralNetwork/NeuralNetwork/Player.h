@@ -11,7 +11,7 @@
 using namespace std;
 
 #define MAXFIELD 1000.0f
-#define DEFAULTHEALTH 100.0
+#define DEFAULTHEALTH 300.0
 
 #define EMPTY_  '_'
 #define PLAYER_ '*'

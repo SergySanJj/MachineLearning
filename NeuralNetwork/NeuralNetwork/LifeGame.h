@@ -84,7 +84,8 @@ public:
 
 	void setPause(unsigned int time_);
 	void initializeAllWithRnd(float a, float b);
-	void echo(bool value); // 1 - print 0 - don't print
+	void echo(bool value); // 1 - create directory 0 - do not
+	void echoPrint(bool value); // 1 - print 0 - don't print
 	char getXY(int X, int Y);
 	vector<int> getResult();
 	bool checkMove(int new_x, int new_y);
@@ -101,6 +102,7 @@ private:
 	unsigned int _evolution = 0;
 	unsigned int _pause = 100;
 	bool _echo = 1;
+	bool _echoPrint = 1;
 	Field* _field = nullptr;
 	vector<Player*> players;
 	vector<deadPlayer*> deadPlayers;

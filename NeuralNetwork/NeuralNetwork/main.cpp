@@ -13,21 +13,21 @@ int main()
 	vector<int> res(10);
 	vector<int> tmpVec(10);
 
-	LifeGame* ldf = new LifeGame(20, 20, 10, 0, 0);
-	//ldf->initializeAllWithRnd(-1.0f, 1.0f);
+	/*LifeGame* ldf = new LifeGame(20, 20, 10, 0, 0);
+	//ldf->initializeAllWithRnd(-2.0f, 2.0f);
 	ldf->play();
 	tmpVec = ldf->getResult();
 	delete ldf;
 	for (int i = 0; i < 10; i++)
 	{
 		res[i] += tmpVec[i];
-	}
+	}*/
 
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		LifeGame* ldf = new LifeGame(20, 20, 10, i, 0);
 		ldf->setPause(0);
-		ldf->echo(0);
+		ldf->echoPrint(0);
 		ldf->play();
 		tmpVec = ldf->getResult();
 		delete ldf;
