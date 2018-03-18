@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include "LifeGame.h"
 #include "NeuralNetwork.h"
 
@@ -80,13 +80,13 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->pos_x = range_n(gen);
 	this->pos_y = range_m(gen);
 
-	while (this->currGame->getXY(this->pos_x, this->pos_y) != '_')
+	while (this->currGame->getXY(this->pos_x, this->pos_y) != ' ')
 	{
 		this->pos_x = range_n(gen);
 		this->pos_y = range_m(gen);
 	}
 
-	setXY(this->pos_x, this->pos_y, '*', *game);
+	setXY(this->pos_x, this->pos_y, '±', *game);
 }
 
 Player::Player(int n, int m, int playerID, LifeGame * game, bool echo)
@@ -130,13 +130,13 @@ Player::Player(int n, int m, int playerID, LifeGame * game, bool echo)
 	this->pos_x = range_n(gen);
 	this->pos_y = range_m(gen);
 
-	while (this->currGame->getXY(this->pos_x, this->pos_y) != '_')
+	while (this->currGame->getXY(this->pos_x, this->pos_y) != ' ')
 	{
 		this->pos_x = range_n(gen);
 		this->pos_y = range_m(gen);
 	}
 
-	setXY(this->pos_x, this->pos_y, '*', *game);
+	setXY(this->pos_x, this->pos_y, '±', *game);
 }
 
 Player::~Player()
@@ -144,9 +144,10 @@ Player::~Player()
 	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
 	savesPath += to_string(this->playerID) + "\\";
 
-	wstring tmpstr(savesPath.begin(), savesPath.end());
+	
 	if (this->neuro != nullptr)
 	{
+		wstring tmpstr(savesPath.begin(), savesPath.end());
 		this->neuro->saveWeightsToDirectory(tmpstr + L"input", "input", "between1");
 		this->neuro->saveWeightsToDirectory(tmpstr + L"between1", "between1", "between2");
 		this->neuro->saveWeightsToDirectory(tmpstr + L"between2", "between1", "sigmoid");
@@ -205,11 +206,15 @@ void Player::activateNeuro(float * input)
 	this->neuro->clearLayerData("between2");
 	this->neuro->setLayerData(input, 6, "input");
 
+	//this->neuro->activatonFunction("input");
+
 	this->neuro->activateLayer("input");
+
+	this->neuro->activatonFunction("between1");
 
 	this->neuro->activateLayer("between1");
 
-	//this->neuro->activatonFunction("between2");
+	this->neuro->activatonFunction("between2");
 
 	this->neuro->activateLayer("between2");
 
@@ -223,6 +228,25 @@ void Player::activateNeuro(float * input)
 
 	int tmp_x = paramToInt(output[0]) + this->pos_x;
 	int tmp_y = paramToInt(output[1]) + this->pos_y;
+
+	if ((tmp_x == this->pos_x && tmp_y == this->pos_y) || !this->currGame->checkMove(tmp_x, tmp_y))
+	{
+		if (!this->currGame->checkMove(tmp_x, tmp_y))
+		{
+			this->addHealth(DEFAULTHEALTH / 5.0f);
+		}
+		mt19937 gen(unsigned int(time(0)));
+		uniform_int_distribution<int> range{ -1,1 };
+		int g_x = -1;
+		int g_y = -1;
+		while (!this->currGame->checkMove(g_x, g_y))
+		{
+			g_x = this->pos_x + range(gen);
+			g_y = this->pos_y + range(gen);
+		} 
+		tmp_x = g_x;
+		tmp_y = g_y;
+	}
 
 	if (this->currGame->checkMove(tmp_x, tmp_y))
 	{

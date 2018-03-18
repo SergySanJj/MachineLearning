@@ -1,4 +1,4 @@
-#include "LifeGame.h"
+﻿#include "LifeGame.h"
 #include "Player.h"
 
 int getMax(int a, int b)
@@ -74,8 +74,7 @@ LifeGame::~LifeGame()
 	for (auto it = this->food.begin();
 		it != this->food.end(); ++it)
 	{
-		if (*it != nullptr)
-			delete (*it);
+		delete (*it);
 	}
 }
 
@@ -211,7 +210,7 @@ void LifeGame::step()
 			tmp = this->players.erase(tmp);
 	}
 
-	this->_field->clearField(); // make all cells '_' then we will rewrite every symbol
+	this->_field->clearField(); // make all cells ' ' then we will rewrite every symbol
 
 	// Reassigne field symbols
 	assigneCells();
@@ -253,7 +252,7 @@ void LifeGame::play()
 	this->_evolution++;
 	teach();
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < this->deadPlayers.size(); i++)
 	{
 		this->deadPlayers[i]->_player->saveWeights();
 	}
@@ -261,16 +260,20 @@ void LifeGame::play()
 
 void LifeGame::teach()
 {
+	if (this->deadPlayers.size() < 5)
+		return;
 	for (int i = 5; i < 7; i++)
 	{
 		this->deadPlayers[i]->_player->mutatePartly();
 	}
-	for (int i = 7; i < 9; i++)
+	for (int i = 7; i < this->deadPlayers.size(); i++)
 	{
 		//this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
-		this->deadPlayers[i]->_player->neuro->crossLayers("input", *this->deadPlayers[i - 7]->_player->neuro->getLayer("input"), 1);
-		this->deadPlayers[i]->_player->neuro->crossLayers("between1", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between1"), 30);
-		this->deadPlayers[i]->_player->neuro->crossLayers("between2", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between2"), 10);
+		NeuralNetwork* deadiNet = this->deadPlayers[i]->_player->neuro;
+		NeuralNetwork* deadi_7Net = this->deadPlayers[i - 7]->_player->neuro;
+		deadiNet->crossLayers("input",    *deadi_7Net->getLayer("input"), 1);
+		deadiNet->crossLayers("between1", *deadi_7Net->getLayer("between1"), 30);
+		deadiNet->crossLayers("between2", *deadi_7Net->getLayer("between2"), 10);
 	}
 }
 
@@ -374,7 +377,7 @@ void LifeGame::generateFood()
 
 	int tmp_x = range_n(gen);
 	int tmp_y = range_m(gen);
-	while (this->_field->getXY(tmp_x, tmp_y) != '_')
+	while (this->_field->getXY(tmp_x, tmp_y) != ' ')
 	{
 		tmp_x = range_n(gen);
 		tmp_y = range_m(gen);
@@ -390,7 +393,7 @@ void LifeGame::assigneCells()
 {
 	for (auto pl = this->players.begin(); pl != this->players.end(); ++pl)
 	{
-		this->_field->setXY((*pl)->get_X(), (*pl)->get_Y(), '*');
+		this->_field->setXY((*pl)->get_X(), (*pl)->get_Y(), '±');
 	}
 	for (auto fd = this->food.begin(); fd != this->food.end(); ++fd)
 	{
@@ -405,7 +408,7 @@ Field::Field(int n, int m) :_n(n), _m(m)
 	{
 		this->_field[i] = new char[m];
 		for (int k = 0; k < m; k++)
-			this->_field[i][k] = '_';
+			this->_field[i][k] = ' ';
 	}
 }
 
@@ -429,6 +432,16 @@ char Field::getXY(int X, int Y)
 	return (this->_field[X][Y]);
 }
 
+int LifeGame::getN()
+{
+	return this->_n;
+}
+
+int LifeGame::getM()
+{
+	return this->_m;
+}
+
 void Field::printField()
 {
 	for (int i = 0; i < this->_n; i++)
@@ -445,7 +458,7 @@ void Field::clearField()
 	{
 		for (int j = 0; j < this->_m; j++)
 		{
-			this->_field[i][j] = '_';
+			this->_field[i][j] = ' ';
 		}
 	}
 }
@@ -457,5 +470,5 @@ void setXY(int X, int Y, char symbol, LifeGame& game)
 
 void movePlayer(int pl_x, int pl_y, int new_x, int new_y, LifeGame& game)
 {
-	game._field->setXY(pl_x, pl_y, '_');
+	game._field->setXY(pl_x, pl_y, ' ');
 }

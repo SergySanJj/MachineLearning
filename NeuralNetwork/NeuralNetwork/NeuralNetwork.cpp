@@ -259,7 +259,7 @@ void NeuralNetwork::mutateLayerPartly(const string & IDFrom, const string & IDTo
 		vector<Neuron> * tmpNeur = this->layers.find(IDFrom)->second->getNeurons();
 
 		mt19937 gen(unsigned int(time(0)));
-		int tmpSize = tmpNeur->size() - 1;
+		int tmpSize = int(tmpNeur->size() - 1);
 		uniform_int_distribution<int> chromo{ 0,tmpSize };
 
 		int tmpCounter = divides;
@@ -492,7 +492,7 @@ void Layer::crossing(Layer & crossWith, int divides)
 		return;
 
 	mt19937 gen(unsigned int(time(0)));
-	int tmpSize = this->neurons->size() - 1;
+	int tmpSize = int(this->neurons->size() - 1);
 	uniform_int_distribution<int> chromo{ 0,tmpSize };
 	int counter = divides;
 	for (int i = 0; i < counter; i++)
