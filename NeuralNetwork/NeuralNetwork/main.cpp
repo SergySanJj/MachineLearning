@@ -9,7 +9,7 @@ using namespace std;
 
 int main()
 {
-	for (int i = 0; i < 400; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		LifeGame* ldf = new LifeGame(20, 20, 10);
 		ldf->setPause(50);

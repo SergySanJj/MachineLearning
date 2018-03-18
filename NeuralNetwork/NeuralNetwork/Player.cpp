@@ -103,6 +103,8 @@ Player::Player(int n, int m, int playerID, LifeGame * game, bool echo)
 	this->neuro->addLayer(2, "sigmoid");
 	this->neuro->addLayer(2, "output");
 
+	this->neuro->setActivationFunction("between", sigmoidDown);
+	this->neuro->setActivationFunction("sigmoid", sigmoidDown);
 	this->neuro->setActivationFunction("output", partFunction);
 
 	this->neuro->connectLayers("input", "between");
@@ -144,7 +146,8 @@ Player::~Player()
 		this->neuro->saveWeightsToDirectory(tmpstr + L"between", "between", "sigmoid");
 		this->neuro->saveWeightsToDirectory(tmpstr + L"sigmoid", "sigmoid", "output");
 
-		this->neuro->deleteNetworkFiles();
+		if (this->_echo == 1)
+			this->neuro->deleteNetworkFiles();
 	}		
 }
 

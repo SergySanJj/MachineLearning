@@ -6,6 +6,7 @@
 #include <ctime>
 #include <stdlib.h>
 #include <string>
+#include "NeuralNetwork.h"
 
 using namespace std;
 
@@ -18,7 +19,6 @@ using namespace std;
 
 /// COMMANDS ///
 
-class NeuralNetwork;
 class LifeGame;
 
 class Player
