@@ -40,6 +40,8 @@ public:
 	void            outputData(const wstring& pathToFile);
 	void            activate();
 	void            clearData();
+	void            setLayerWeights(float value);
+	void            crossing(Layer& crossWith, int divides); // crossing of (1/divider) weights for layers with same size
 
 private:
 	vector<Neuron> *neurons = nullptr;
@@ -62,9 +64,12 @@ public:
 
 	void echo(bool value);
 	bool setLayerData(float mas[], unsigned int n, const string& ID);
+	bool setLayerWeights(const string& ID, float value);
 	bool setActivationFunction(const string& ID, float(*f)(float));
 
 	float* getData(const string& ID);
+
+	Layer* getLayer(const string& ID);
 
 	void addLayer(unsigned int  neuronQuantity,
 		const string& layerID);
@@ -92,6 +97,8 @@ public:
 
 	void mutate(const float &a, const float &b);
 
+	void mutateLayerPartly(const string&IDFrom, const  string& IDTo, const float &a, const float &b, int divides);
+
 	void activateLayer(const string& ID);
 
 	void outputDataToFile(const string& ID, const wstring& path);
@@ -101,6 +108,9 @@ public:
 	bool clearLayerData(const string& ID);
 
 	void deleteNetworkFiles();
+
+	void crossLayers(const string&ID, Layer& crossWith, int divides);
+
 
 private:
 	unordered_map<string, Layer*> layers; // key, point to the layer of nodes

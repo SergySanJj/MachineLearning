@@ -25,6 +25,7 @@ using namespace std;
 #define MAXLEN 10000.0f // max coord of vector to enemy (etalon)
 #define PAUSE_BETWEEN_GAMES 10
 
+
 class Player;
 
 /*
@@ -77,11 +78,12 @@ struct deadPlayer
 class LifeGame
 {
 public:
-	LifeGame(int n, int m, int numberOfPlayers);
-	LifeGame(int n, int m, int numberOfPlayers, bool echo);
+	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution);
+	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, bool echo);
 	~LifeGame();
 
 	void setPause(unsigned int time_);
+	void initializeAllWithRnd(float a, float b);
 	void echo(bool value); // 1 - print 0 - don't print
 	char getXY(int X, int Y);
 	bool checkMove(int new_x, int new_y);

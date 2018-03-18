@@ -9,11 +9,17 @@ using namespace std;
 
 int main()
 {
-	for (int i = 0; i < 400; i++)
+	system("MODE CON: COLS=140 LINES=70");
+
+	LifeGame* ldf = new LifeGame(20, 20, 10, 0);
+	ldf->initializeAllWithRnd(-1.0f, 1.0f);
+	ldf->play();
+	delete ldf;
+	for (int i = 0; i < 1000; i++)
 	{
-		LifeGame* ldf = new LifeGame(20, 20, 10);
+		LifeGame* ldf = new LifeGame(20, 20, 10, i);
 		ldf->setPause(50);
-		ldf->echo(0);
+		//ldf->echo(0);
 		ldf->play();
 		delete ldf;
 	}
