@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef Player_H_
 #define Player_H_
@@ -13,8 +13,8 @@ using namespace std;
 #define MAXFIELD 1000.0f
 #define DEFAULTHEALTH 100.0
 
-#define EMPTY_  '_'
-#define PLAYER_ '*'
+#define EMPTY_  ' '
+#define PLAYER_ '±'
 #define FOOD_   '+'
 
 /// COMMANDS ///

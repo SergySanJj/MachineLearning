@@ -21,7 +21,7 @@ using namespace std;
 
 #define INFOSIZE 5     // Player info vector size
 #define MAXSTEPS 10000 // maximum number of steps in each game
-#define FOODVALUE 20
+#define FOODVALUE 30
 #define MAXLEN 10000.0f // max coord of vector to enemy (etalon)
 #define PAUSE_BETWEEN_GAMES 10
 
@@ -31,7 +31,7 @@ class Player;
 /*
 struct FieldCell
 {
-	char symbol = '_';
+	char symbol = ' ';
 	Player* _player = nullptr;
 
 	void movePlayer(Player* player,int x_from, int y_from, int x_to, int y_to);
@@ -46,6 +46,7 @@ public:
 
 	void setXY(int X, int Y, char symbol);
 	char getXY(int X, int Y);
+
 
 	void printField();
 	void clearField();
@@ -84,8 +85,11 @@ public:
 
 	void setPause(unsigned int time_);
 	void initializeAllWithRnd(float a, float b);
-	void echo(bool value); // 1 - print 0 - don't print
+	void echo(bool value); // 1 - create directory 0 - do not
+	void echoPrint(bool value); // 1 - print 0 - don't print
 	char getXY(int X, int Y);
+	int getN();
+	int getM();
 	vector<int> getResult();
 	bool checkMove(int new_x, int new_y);
 
@@ -101,6 +105,7 @@ private:
 	unsigned int _evolution = 0;
 	unsigned int _pause = 100;
 	bool _echo = 1;
+	bool _echoPrint = 1;
 	Field* _field = nullptr;
 	vector<Player*> players;
 	vector<deadPlayer*> deadPlayers;

@@ -47,7 +47,7 @@ int DeleteDirectory(const string& pathToDelDir, bool bDeleteSubdirectories = 1)
 						return ::GetLastError();
 				}
 			}
-		} while (::FindNextFile(hFile, &FileInformation) == TRUE);
+		} while (::FindNextFile(hFile, &FileInformation) != FALSE);
 
 		// Close handle.
 		::FindClose(hFile);
