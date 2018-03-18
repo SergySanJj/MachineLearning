@@ -23,13 +23,13 @@ LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
 	}
 }
 
-LifeGame::LifeGame(int n, int m, int numberOfPlayers, bool echo)
+LifeGame::LifeGame(int n, int m, int numberOfPlayers, bool echo) :_n(n), _m(m)
 {
 	this->_echo = echo;
 	this->_field = new Field(n, m);
 	for (int i = 0; i < numberOfPlayers; i++)
 	{
-		Player* tmpPlayer = new Player(n, m, i, this);
+		Player* tmpPlayer = new Player(n, m, i, this, echo);
 		this->players.push_back(tmpPlayer);
 	}
 }
