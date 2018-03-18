@@ -52,15 +52,13 @@ NeuralNetwork::~NeuralNetwork()
 	}
 }
 
-float * NeuralNetwork::getData(const string & ID)
+vector<float> NeuralNetwork::getData(const string & ID)
 {
 	Layer* layer = this->layers.find(ID)->second;
 	int n = (*layer).getSize();
 
-	if (n == 0)
-		return nullptr;
-
-	float* mas = new float[n];
+	vector<float> mas(n);
+	//float* mas = new float[n];
 
 	for (int i = 0; i < n; i++)
 	{

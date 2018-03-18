@@ -86,6 +86,7 @@ public:
 	void initializeAllWithRnd(float a, float b);
 	void echo(bool value); // 1 - print 0 - don't print
 	char getXY(int X, int Y);
+	vector<int> getResult();
 	bool checkMove(int new_x, int new_y);
 
 	void step();

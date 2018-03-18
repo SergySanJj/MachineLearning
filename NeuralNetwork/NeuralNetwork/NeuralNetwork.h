@@ -67,7 +67,7 @@ public:
 	bool setLayerWeights(const string& ID, float value);
 	bool setActivationFunction(const string& ID, float(*f)(float));
 
-	float* getData(const string& ID);
+	vector<float> getData(const string& ID);
 
 	Layer* getLayer(const string& ID);
 
