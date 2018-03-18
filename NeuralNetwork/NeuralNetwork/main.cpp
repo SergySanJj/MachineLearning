@@ -9,10 +9,10 @@ using namespace std;
 
 int main()
 {
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 400; i++)
 	{
-		LifeGame* ldf = new LifeGame(10, 10, 10);
-		ldf->setPause(100);
+		LifeGame* ldf = new LifeGame(20, 20, 10);
+		ldf->setPause(50);
 		ldf->echo(0);
 		ldf->play();
 		delete ldf;

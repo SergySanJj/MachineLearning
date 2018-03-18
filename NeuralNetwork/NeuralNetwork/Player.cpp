@@ -4,9 +4,9 @@
 
 float partFunction(float x)
 {
-	if (x <= -2.5f)
+	if (x <= -0.25f)
 		return -1.0f;
-	if (x >= 2.5f)
+	if (x >= 0.25f)
 		return 1.0f;
 	else
 		return 0.0f;
@@ -20,16 +20,21 @@ wstring ToWString(const string& s)
 
 int paramToInt(float param)
 {
-	if ((param - 1.0f) < FLT_EPSILON)
+	if (param > 0.9f)
 	{
 		return 1;
 	}
-	if ((param - 0.0f) < FLT_EPSILON)
+	if (param < -0.9)
 	{
-		return 0;
+		return -1;
 	}
 	else
-		return -1;
+		return 0;
+}
+
+float sigmoidDown(float x)    // Sigmoid - 0.5
+{
+	return ((1.0f / (1.0f + float(pow(e, -x))))-0.5f);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -50,6 +55,8 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->neuro->addLayer(2, "sigmoid");
 	this->neuro->addLayer(2, "output");
 
+	this->neuro->setActivationFunction("between", sigmoidDown);
+	this->neuro->setActivationFunction("sigmoid", sigmoidDown);
 	this->neuro->setActivationFunction("output", partFunction);
 
 	this->neuro->connectLayers("input", "between");
@@ -184,12 +191,19 @@ void Player::clearNeuroData()
 
 void Player::activateNeuro(float * input)
 {
+	this->neuro->clearLayerData("input");
+	this->neuro->clearLayerData("between");
+	this->neuro->clearLayerData("sigmoid");
+	this->neuro->clearLayerData("output");
 	this->neuro->setLayerData(input, 6, "input");
 
 	this->neuro->activateLayer("input");
+
+	this->neuro->activatonFunction("between");
+
 	this->neuro->activateLayer("between");
 
-	//this->neuro->activatonFunction("sigmoid");
+	this->neuro->activatonFunction("sigmoid");
 
 	this->neuro->activateLayer("sigmoid");
 
@@ -209,10 +223,10 @@ void Player::activateNeuro(float * input)
 	delete[] output;
 }
 
-void Player::mutate()
+void Player::mutate(float a, float b)
 {
-	this->neuro->randomizeWeights("input", "between", -0.4f, 0.4f);
-	this->neuro->randomizeWeights("between", "sigmoid", -0.4f, 0.4f);
+	this->neuro->randomizeWeights("input", "between", a, b);
+	this->neuro->randomizeWeights("between", "sigmoid", a, b);
 }
 
 void Player::addHealth(float value)
