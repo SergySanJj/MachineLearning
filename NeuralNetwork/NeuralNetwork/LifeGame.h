@@ -25,6 +25,7 @@ using namespace std;
 #define MAXLEN 10000.0f // max coord of vector to enemy (etalon)
 #define PAUSE_BETWEEN_GAMES 10
 
+
 class Player;
 
 /*

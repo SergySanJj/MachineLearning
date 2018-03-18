@@ -28,6 +28,7 @@ public:
 	Neuron();
 	~Neuron();
 
+	void copyWeights(const Neuron& copyFrom); // copy weights from same type neuron
 	void setInput(float input);
 	void activate();
 	inline void increase(float value);

@@ -69,6 +69,11 @@ float * NeuralNetwork::getData(const string & ID)
 	return mas;
 }
 
+Layer * NeuralNetwork::getLayer(const string & ID)
+{
+	return (*(this->layers.find(ID))).second;
+}
+
 void NeuralNetwork::addLayer(unsigned int neuronQuantity, const string& layerID)
 {
 	if (checkForFileName(layerID)) // check on _ . < > , \ / ? * in id
@@ -243,6 +248,36 @@ void NeuralNetwork::mutate(const float & a, const float & b)
 	}
 }
 
+void NeuralNetwork::mutateLayerPartly(const string & IDFrom, const string & IDTo, const float & a, const float & b, int divides)
+{
+	if (this->layers.find(IDFrom) == this->layers.end())
+		return;
+	else
+	{
+		std::random_device rd;
+		std::mt19937 mt(rd());
+		std::uniform_real_distribution<double> dist(a, std::nextafter(b, DBL_MAX));
+
+		vector<Neuron> * tmpNeur = this->layers.find(IDFrom)->second->getNeurons();
+
+		mt19937 gen(unsigned int(time(0)));
+		uniform_int_distribution<int> chromo{ 0,tmpNeur->size() - 1 };
+
+		int tmpCounter = divides;
+		for (int i = 0; i < tmpCounter; i++)
+		{
+			int tmpChromo = chromo(gen);
+			for (auto edgeIt  = ((*tmpNeur)[tmpChromo]).getEdges()->find(IDTo)->second.begin();
+				      edgeIt != ((*tmpNeur)[tmpChromo]).getEdges()->find(IDTo)->second.end(); ++edgeIt)
+			{
+				(*edgeIt)->weight = float(dist(mt));
+			}
+		}
+	}
+	
+}
+
+
 void NeuralNetwork::activateLayer(const string & ID)
 {
 	(*(this->layers.find(ID))).second->activate();
@@ -274,6 +309,15 @@ void NeuralNetwork::deleteNetworkFiles()
 {
 	if (this->_echo == 1)
 		this->fs.deleteNetwork();
+}
+
+void NeuralNetwork::crossLayers(const string & ID, Layer & crossWith, int divides)
+{
+	if (checkLayerExist(ID) == 0)
+	{
+		return;
+	}
+	(*(this->layers.find(ID))).second->crossing(crossWith, divides);
 }
 
 void NeuralNetwork::echo(bool value)
@@ -424,6 +468,22 @@ void Layer::clearData()
 		neurons__ != this->neurons->end(); ++neurons__)
 	{
 		(*neurons__).setInput(0.0f);
+	}
+}
+
+void Layer::crossing(Layer & crossWith, int divides)
+{
+	if (this->neurons->size() != crossWith.neurons->size())
+		return;
+
+	mt19937 gen(unsigned int(time(0)));
+	uniform_int_distribution<int> chromo{ 0,this->neurons->size()-1 };
+	int counter = divides;
+	for (int i = 0; i < counter; i++)
+	{
+		int tmpChromo = chromo(gen);
+		vector<Neuron>* tmpNeur = (crossWith.getNeurons());
+		(*this->neurons)[tmpChromo].copyWeights((*tmpNeur)[tmpChromo]);
 	}
 }
 

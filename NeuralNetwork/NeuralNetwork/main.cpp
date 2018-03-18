@@ -11,7 +11,7 @@ int main()
 {
 	for (int i = 0; i < 50; i++)
 	{
-		LifeGame* ldf = new LifeGame(20, 20, 10);
+		LifeGame* ldf = new LifeGame(20, 20, 10, 0);
 		ldf->setPause(50);
 		ldf->echo(0);
 		ldf->play();

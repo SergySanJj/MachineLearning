@@ -209,7 +209,8 @@ void LifeGame::play()
 	cout << '\n' << "     *Results*\n";
 	for (int i = 0; i < this->deadPlayers.size(); i++)
 	{
-		cout << " player_" << this->deadPlayers[i]->_player->getID() << "  " << this->deadPlayers[i]->lastStep << "\n";
+		deadPlayer* tmp = this->deadPlayers[i];
+		cout << " player_" << tmp->_player->getID() << "  " << tmp->lastStep << "\n";
 	}
 	cout << "evolution #" << this->_evolution << "\n";
 	Sleep(PAUSE_BETWEEN_GAMES);
@@ -227,11 +228,13 @@ void LifeGame::teach()
 	//sort(this->deadPlayers.begin(), this->deadPlayers.end(), cmpDead);
 	for (int i = 3; i < 7; i++)
 	{
-		this->deadPlayers[i]->_player->mutate(-2.0f, 2.0f);
+		this->deadPlayers[i]->_player->mutatePartly();
 	}
 	for (int i = 7; i < 9; i++)
 	{
-		this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
+		//this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
+		this->deadPlayers[i]->_player->neuro->crossLayers("input", *this->deadPlayers[i - 7]->_player->neuro->getLayer("input"), 1);
+		this->deadPlayers[i]->_player->neuro->crossLayers("between", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between"), 8);
 	}
 }
 

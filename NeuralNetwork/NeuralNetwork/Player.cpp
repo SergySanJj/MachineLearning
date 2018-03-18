@@ -249,3 +249,9 @@ void Player::saveWeights()
 	this->neuro->saveWeightsToDirectory(tmpstr + L"sigmoid", "sigmoid", "output");
 }
 
+void Player::mutatePartly()
+{
+	this->neuro->mutateLayerPartly("input", "between", -0.2f, 0.2f, 1);
+	this->neuro->mutateLayerPartly("between", "sigmoid", -1.0f, 1.0f, 8);
+}
+

@@ -40,6 +40,7 @@ public:
 	void mutate(float a, float b);
 	void addHealth(float value);
 	void saveWeights();
+	void mutatePartly();
 
 private:
 	int playerID = 0;
