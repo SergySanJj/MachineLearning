@@ -4,9 +4,9 @@
 
 float partFunction(float x)
 {
-	if (x <= -0.25f)
+	if (x <= -0.5f)
 		return -1.0f;
-	if (x >= 0.25f)
+	if (x >= 0.5f)
 		return 1.0f;
 	else
 		return 0.0f;
@@ -212,9 +212,9 @@ void Player::activateNeuro(float * input)
 
 	this->neuro->activateLayer("sigmoid");
 
-	this->neuro->activatonFunction("output");
+	//this->neuro->activatonFunction("output");
 
-	float* output = (this->neuro->getData("output")); // output size = 2
+	vector<float> output = this->neuro->getData("sigmoid"); // output size = 2
 
 	int tmp_x = paramToInt(output[0]) + this->pos_x;
 	int tmp_y = paramToInt(output[1]) + this->pos_y;
@@ -225,7 +225,6 @@ void Player::activateNeuro(float * input)
 		this->pos_y = tmp_y;
 	}
 
-	delete[] output;
 }
 
 void Player::mutate(float a, float b)

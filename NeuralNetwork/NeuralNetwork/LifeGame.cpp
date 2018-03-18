@@ -271,6 +271,16 @@ char LifeGame::getXY(int X, int Y)
 	return (this->_field->getXY(X, Y));
 }
 
+vector<int> LifeGame::getResult()
+{
+	vector<int> res(this->deadPlayers.size());
+	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
+	{
+		res[(*it)->_player->getID()] = (*it)->lastStep;
+	}
+	return res;
+}
+
 bool LifeGame::checkMove(int new_x, int new_y)
 {
 	if (new_x > 0 && new_y > 0)
