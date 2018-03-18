@@ -37,7 +37,7 @@ public:
 	void copyNeuro(const Player& right);
 	void clearNeuroData();
 	void activateNeuro(float* input);
-	void mutate();
+	void mutate(float a, float b);
 	void addHealth(float value);
 	void saveWeights();
 

@@ -66,7 +66,7 @@ LifeGame::~LifeGame()
 		}
 	}
 
-	for (auto neural = neurals.begin(); neural != neurals.end(); ++neural)
+	for (auto neural = neurals.begin(); neural != neurals.end(); ++neural) // HERE
 	{
 		delete (*neural);
 	}
@@ -227,7 +227,7 @@ void LifeGame::teach()
 	//sort(this->deadPlayers.begin(), this->deadPlayers.end(), cmpDead);
 	for (int i = 3; i < 7; i++)
 	{
-		this->deadPlayers[i]->_player->mutate();
+		this->deadPlayers[i]->_player->mutate(-2.0f, 2.0f);
 	}
 	for (int i = 7; i < 9; i++)
 	{
