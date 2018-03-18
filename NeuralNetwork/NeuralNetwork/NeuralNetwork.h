@@ -40,6 +40,7 @@ public:
 	void            outputData(const wstring& pathToFile);
 	void            activate();
 	void            clearData();
+	void            setLayerWeights(float value);
 	void            crossing(Layer& crossWith, int divides); // crossing of (1/divider) weights for layers with same size
 
 private:
@@ -63,6 +64,7 @@ public:
 
 	void echo(bool value);
 	bool setLayerData(float mas[], unsigned int n, const string& ID);
+	bool setLayerWeights(const string& ID, float value);
 	bool setActivationFunction(const string& ID, float(*f)(float));
 
 	float* getData(const string& ID);
@@ -108,6 +110,7 @@ public:
 	void deleteNetworkFiles();
 
 	void crossLayers(const string&ID, Layer& crossWith, int divides);
+
 
 private:
 	unordered_map<string, Layer*> layers; // key, point to the layer of nodes

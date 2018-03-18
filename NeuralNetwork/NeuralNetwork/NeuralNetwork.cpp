@@ -261,7 +261,8 @@ void NeuralNetwork::mutateLayerPartly(const string & IDFrom, const string & IDTo
 		vector<Neuron> * tmpNeur = this->layers.find(IDFrom)->second->getNeurons();
 
 		mt19937 gen(unsigned int(time(0)));
-		uniform_int_distribution<int> chromo{ 0,tmpNeur->size() - 1 };
+		int tmpSize = tmpNeur->size() - 1;
+		uniform_int_distribution<int> chromo{ 0,tmpSize };
 
 		int tmpCounter = divides;
 		for (int i = 0; i < tmpCounter; i++)
@@ -338,6 +339,14 @@ bool NeuralNetwork::setLayerData(float mas[], unsigned int n, const string & ID)
 			return 0;
 		}
 	}
+}
+
+bool NeuralNetwork::setLayerWeights(const string & ID, float value)
+{
+	if (checkLayerExist(ID))
+		return 0;
+	(*(this->layers.find(ID))).second->setLayerWeights(value);
+	return 1;
 }
 
 bool NeuralNetwork::setActivationFunction(const string & ID, float(*f)(float))
@@ -471,13 +480,22 @@ void Layer::clearData()
 	}
 }
 
+void Layer::setLayerWeights(float value)
+{
+	for (auto it = this->neurons->begin(); it != this->neurons->end(); ++it)
+	{
+		(*it).setWeights(value);
+	}
+}
+
 void Layer::crossing(Layer & crossWith, int divides)
 {
 	if (this->neurons->size() != crossWith.neurons->size())
 		return;
 
 	mt19937 gen(unsigned int(time(0)));
-	uniform_int_distribution<int> chromo{ 0,this->neurons->size()-1 };
+	int tmpSize = this->neurons->size() - 1;
+	uniform_int_distribution<int> chromo{ 0,tmpSize };
 	int counter = divides;
 	for (int i = 0; i < counter; i++)
 	{

@@ -51,6 +51,17 @@ void Neuron::setInput(float input)
 	this->data = input;
 }
 
+void Neuron::setWeights(float value)
+{
+	for (auto connection = this->edges.begin(); connection != this->edges.end(); ++connection)
+	{
+		for (auto vEdges = (*connection).second.begin(); vEdges != (*connection).second.end(); ++vEdges)
+		{
+			(*vEdges)->weight = value;
+		}
+	}
+}
+
 void Neuron::activate()
 {
 	for (auto it = this->edges.begin();

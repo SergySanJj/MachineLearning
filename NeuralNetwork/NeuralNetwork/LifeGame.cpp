@@ -13,7 +13,7 @@ bool cmpDead(const deadPlayer* a, const deadPlayer* b)
 
 ////////////////////////////////////////////////////////////////////
 
-LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
+LifeGame::LifeGame(int n, int m, int  numberOfPlayers, unsigned int evolution) :_n(n), _m(m), _evolution(evolution)
 {
 	this->_field = new Field(n, m);
 	for (int i = 0; i < numberOfPlayers; i++)
@@ -23,7 +23,7 @@ LifeGame::LifeGame(int n, int m, int  numberOfPlayers) :_n(n), _m(m)
 	}
 }
 
-LifeGame::LifeGame(int n, int m, int numberOfPlayers, bool echo) :_n(n), _m(m)
+LifeGame::LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, bool echo) :_n(n), _m(m), _evolution(evolution)
 {
 	this->_echo = echo;
 	this->_field = new Field(n, m);
@@ -84,6 +84,16 @@ void LifeGame::setPause(unsigned int time_)
 	this->_pause = time_;
 }
 
+void LifeGame::initializeAllWithRnd(float a, float b)
+{
+	for (auto it = this->players.begin(); it != this->players.end(); ++it)
+	{
+		(*it)->neuro->setLayerWeights("input", 0.0f);
+		(*it)->neuro->setLayerWeights("between", 0.0f);
+		(*it)->mutate(a, b);
+	}
+}
+
 void LifeGame::echo(bool value)
 {
 	this->_echo = value;
@@ -126,6 +136,25 @@ void LifeGame::step()
 
 						this->deadPlayers.push_back(tmpDead);
 					}
+					this->players[i]->addHealth(FOODVALUE);
+				}
+				else
+				{
+					bool alreadyExists = 0;
+					for (auto dead = this->deadPlayers.begin(); dead != this->deadPlayers.end(); ++dead)
+					{
+						if ((*dead)->_player == this->players[i])
+							alreadyExists = 1;
+					}
+					if (!alreadyExists)
+					{
+						deadPlayer* tmpDead = new deadPlayer();
+						tmpDead->_player = this->players[i];
+						tmpDead->lastStep = this->_step;
+
+						this->deadPlayers.push_back(tmpDead);
+					}
+					this->players[k]->addHealth(FOODVALUE);
 				}
 			}
 		}
@@ -225,8 +254,7 @@ void LifeGame::play()
 
 void LifeGame::teach()
 {
-	//sort(this->deadPlayers.begin(), this->deadPlayers.end(), cmpDead);
-	for (int i = 3; i < 7; i++)
+	for (int i = 5; i < 7; i++)
 	{
 		this->deadPlayers[i]->_player->mutatePartly();
 	}
@@ -234,7 +262,7 @@ void LifeGame::teach()
 	{
 		//this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
 		this->deadPlayers[i]->_player->neuro->crossLayers("input", *this->deadPlayers[i - 7]->_player->neuro->getLayer("input"), 1);
-		this->deadPlayers[i]->_player->neuro->crossLayers("between", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between"), 8);
+		this->deadPlayers[i]->_player->neuro->crossLayers("between", *this->deadPlayers[i - 7]->_player->neuro->getLayer("between"), 10);
 	}
 }
 
