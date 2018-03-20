@@ -11,7 +11,12 @@
 using namespace std;
 
 #define MAXFIELD 1000.0f
-#define DEFAULTHEALTH 100.0
+#define DEFAULTHEALTH 100.0f
+#define MAXHEALTH 400.0f
+#define STEPDECREACE -5.0f
+
+#define MUTATEEVERY 3
+#define MINEFF ((DEFAULTHEALTH/ STEPDECREACE)*MUTATEEVERY)
 
 #define EMPTY_  ' '
 #define PLAYER_ '±'
@@ -24,12 +29,12 @@ class LifeGame;
 class Player
 {
 public:
-	Player(int n, int m, int playerID, LifeGame* game);
+	Player(int n, int m, int playerID, LifeGame* game );
 	Player(int n, int m, int playerID, LifeGame* game, bool echo);
 	~Player();
 
 	NeuralNetwork * neuro = nullptr;
-
+	void setHealth(float value);
 	int get_X();
 	int get_Y();
 	int getID();

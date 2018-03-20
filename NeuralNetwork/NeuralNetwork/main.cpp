@@ -10,29 +10,24 @@ using namespace std;
 int main()
 {
 	system("MODE CON: COLS=101 LINES=51");
-	vector<int> res(10);
+
+	int numPlayers = 10;
+
+	vector<int> res(numPlayers);
 	vector<int> tmpVec(10);
 
-	/*LifeGame* ldf = new LifeGame(20, 20, 10, 0, 0);
-	//ldf->initializeAllWithRnd(-2.0f, 2.0f);
-	ldf->play();
-	tmpVec = ldf->getResult();
-	delete ldf;
-	for (int i = 0; i < 10; i++)
-	{
-		res[i] += tmpVec[i];
-	}*/
+	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
 
 	for (int i = 0; i < 1500; i++)
 	{
-		LifeGame* ldf = new LifeGame(40, 40, 16, i, 0);
+		LifeGame* ldf = new LifeGame(40, 40, numPlayers, i, savesPath, savesPath,0);
 		if (i == 0)
 		{
 			//ldf->initializeAllWithRnd(-10.0f, 10.0f);
 		}
 		ldf->setPause(100);
 		//ldf->echoPrint(0);
-		ldf->play();
+		ldf->play(res);
 		tmpVec = ldf->getResult();
 		delete ldf;
 		for (int k = 0; k < 10; k++)

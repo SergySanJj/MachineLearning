@@ -41,11 +41,13 @@ float sigmoidDown(float x)    // Sigmoid - 0.5
 
 Player::Player(int n, int m, int playerID, LifeGame* game)
 {
+	this->currGame = game;
+
 	mt19937 gen(unsigned int(time(0)));
-	uniform_int_distribution<int> health_{ int(DEFAULTHEALTH-20.0),int(DEFAULTHEALTH+20.0) };
+	uniform_int_distribution<int> health_{ int(DEFAULTHEALTH*0.9),int(DEFAULTHEALTH*1.1) };
 	uniform_int_distribution<int> range_n{ 0,n - 1 };
 	uniform_int_distribution<int> range_m{ 0,m - 1 };
-	//default_random_engine re{};
+
 	this->health = float(health_(gen));
 	this->playerID = playerID;
 
@@ -55,17 +57,15 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->neuro->addLayer(100, "between1");
 	this->neuro->addLayer(100, "between2");
 	this->neuro->addLayer(2, "sigmoid");
-	//this->neuro->addLayer(2, "output");
 
 	this->neuro->setActivationFunction("between2", sigmoidDown);
 	this->neuro->setActivationFunction("sigmoid", sigmoidDown);
-	//this->neuro->setActivationFunction("output", partFunction);
 
 	this->neuro->connectLayers("input", "between1");
 	this->neuro->connectLayers("between1", "between2");
 	this->neuro->connectLayers("between2", "sigmoid"); 
 
-	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
+	string savesPath = game->getLoadPath();
 	savesPath += to_string(this->playerID) + "\\";
 
 	wstring tmpstr(savesPath.begin(), savesPath.end());
@@ -73,9 +73,6 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 	this->neuro->loadWeightsFromFile(tmpstr + L"input\\input_between1_.txt", "input", "between1");
 	this->neuro->loadWeightsFromFile(tmpstr + L"between\\between1_between2_.txt", "between1", "between2");
 	this->neuro->loadWeightsFromFile(tmpstr + L"sigmoid\\between2_sigmoid_.txt", "between2", "sigmoid");
-	//this->neuro->setLayerWeights("sigmoid", 1.0f);
-
-	this->currGame = game;
 
 	this->pos_x = range_n(gen);
 	this->pos_y = range_m(gen);
@@ -91,41 +88,37 @@ Player::Player(int n, int m, int playerID, LifeGame* game)
 
 Player::Player(int n, int m, int playerID, LifeGame * game, bool echo)
 {
-	this->_echo = echo;
+	this->currGame = game;
+
 	mt19937 gen(unsigned int(time(0)));
+	uniform_int_distribution<int> health_{ int(DEFAULTHEALTH*0.9),int(DEFAULTHEALTH*1.1) };
 	uniform_int_distribution<int> range_n{ 0,n - 1 };
 	uniform_int_distribution<int> range_m{ 0,m - 1 };
-	//default_random_engine re{};
-
+	this->health = float(health_(gen));
 	this->playerID = playerID;
 
 	this->neuro = new NeuralNetwork("player_" + to_string(this->playerID), echo);
 
 	this->neuro->addLayer(6, "input");
-	this->neuro->addLayer(50, "between1");
-	this->neuro->addLayer(50, "between2");
+	this->neuro->addLayer(100, "between1");
+	this->neuro->addLayer(100, "between2");
 	this->neuro->addLayer(2, "sigmoid");
-	//this->neuro->addLayer(2, "output");
 
 	this->neuro->setActivationFunction("between2", sigmoidDown);
 	this->neuro->setActivationFunction("sigmoid", sigmoidDown);
-	//this->neuro->setActivationFunction("output", partFunction);
 
 	this->neuro->connectLayers("input", "between1");
 	this->neuro->connectLayers("between1", "between2");
 	this->neuro->connectLayers("between2", "sigmoid");
 
-	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
+	string savesPath = game->getLoadPath();
 	savesPath += to_string(this->playerID) + "\\";
 
 	wstring tmpstr(savesPath.begin(), savesPath.end());
 
 	this->neuro->loadWeightsFromFile(tmpstr + L"input\\input_between1_.txt", "input", "between1");
-	this->neuro->loadWeightsFromFile(tmpstr + L"between1\\between1_between2_.txt", "between1", "between2");
-	this->neuro->loadWeightsFromFile(tmpstr + L"between2\\between2_sigmoid_.txt", "between2", "sigmoid");
-	//this->neuro->setLayerWeights("sigmoid", 1.0f);
-
-	this->currGame = game;
+	this->neuro->loadWeightsFromFile(tmpstr + L"between\\between1_between2_.txt", "between1", "between2");
+	this->neuro->loadWeightsFromFile(tmpstr + L"sigmoid\\between2_sigmoid_.txt", "between2", "sigmoid");
 
 	this->pos_x = range_n(gen);
 	this->pos_y = range_m(gen);
@@ -141,7 +134,12 @@ Player::Player(int n, int m, int playerID, LifeGame * game, bool echo)
 
 Player::~Player()
 {
-	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
+	if (this->neuro != nullptr)
+	{
+		this->neuro->deleteNetworkFiles();
+	}
+	/*
+	string savesPath = this->currGame->getSavesPath();
 	savesPath += to_string(this->playerID) + "\\";
 
 	
@@ -154,9 +152,14 @@ Player::~Player()
 
 		if (this->_echo == 1)
 			this->neuro->deleteNetworkFiles();
-	}		
+	}		*/
 }
 
+
+void Player::setHealth(float value)
+{
+	this->health = value;
+}
 
 int Player::get_X()
 {
@@ -270,7 +273,7 @@ void Player::addHealth(float value)
 
 void Player::saveWeights()
 {
-	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
+	string savesPath = this->currGame->getSavesPath();
 	savesPath += to_string(this->playerID) + "\\";
 
 	wstring tmpstr(savesPath.begin(), savesPath.end());
@@ -283,7 +286,7 @@ void Player::saveWeights()
 void Player::mutatePartly()
 {
 	this->neuro->mutateLayerPartly("input", "between1", -0.1f, 0.1f, 1);
-	this->neuro->mutateLayerPartly("between1", "between2", -2.0f, 1.0f, 32);
+	this->neuro->mutateLayerPartly("between1", "between2", -0.1f, 0.1f, 32);
 	this->neuro->mutateLayerPartly("between2", "sigmoid", -0.1f, 0.1f, 20);
 }
 

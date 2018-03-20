@@ -21,7 +21,7 @@ using namespace std;
 
 #define INFOSIZE 5     // Player info vector size
 #define MAXSTEPS 10000 // maximum number of steps in each game
-#define FOODVALUE 30
+#define FOODVALUE 100
 #define MAXLEN 10000.0f // max coord of vector to enemy (etalon)
 #define PAUSE_BETWEEN_GAMES 10
 
@@ -79,10 +79,11 @@ struct deadPlayer
 class LifeGame
 {
 public:
-	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution);
-	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, bool echo);
+	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, const string &savesTo, const string &loadFrom);
+	LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, const string &savesTo, const string &loadFrom, bool echo);
 	~LifeGame();
-
+	string& getSavesPath();
+	string& getLoadPath();
 	void setPause(unsigned int time_);
 	void initializeAllWithRnd(float a, float b);
 	void echo(bool value); // 1 - create directory 0 - do not
@@ -94,8 +95,8 @@ public:
 	bool checkMove(int new_x, int new_y);
 
 	void step();
-	void play();
-	void teach();
+	void play(vector<int> &results);
+	void teach(vector<int> &results);
 	void printField();
 	
 private:
@@ -106,6 +107,8 @@ private:
 	unsigned int _pause = 100;
 	bool _echo = 1;
 	bool _echoPrint = 1;
+	string _loadFrom = "";
+	string _saveTo = "";
 	Field* _field = nullptr;
 	vector<Player*> players;
 	vector<deadPlayer*> deadPlayers;
@@ -115,6 +118,7 @@ private:
 	friend void movePlayer(int pl_x, int pl_y, int new_x, int new_y, LifeGame&);
 	void generateFood();
 	void assigneCells();
+	void eraseOddPlayers();
 
 	float* formInputVector(Player* formFor);
 };

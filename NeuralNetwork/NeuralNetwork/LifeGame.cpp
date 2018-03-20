@@ -13,8 +13,12 @@ bool cmpDead(const deadPlayer* a, const deadPlayer* b)
 
 ////////////////////////////////////////////////////////////////////
 
-LifeGame::LifeGame(int n, int m, int  numberOfPlayers, unsigned int evolution) :_n(n), _m(m), _evolution(evolution)
+LifeGame::LifeGame(int n, int m, int  numberOfPlayers, unsigned int evolution,
+	               const string &savesTo,
+	               const string &loadFrom) :_n(n), _m(m), _evolution(evolution), _saveTo(savesTo), _loadFrom(loadFrom)
 {
+	this->_saveTo = savesTo;
+	this->_loadFrom = loadFrom;
 	this->_field = new Field(n, m);
 	for (int i = 0; i < numberOfPlayers; i++)
 	{
@@ -23,7 +27,10 @@ LifeGame::LifeGame(int n, int m, int  numberOfPlayers, unsigned int evolution) :
 	}
 }
 
-LifeGame::LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution, bool echo) :_n(n), _m(m), _evolution(evolution)
+LifeGame::LifeGame(int n, int m, int numberOfPlayers, unsigned int evolution,
+	               const string &savesTo,
+	               const string &loadFrom,
+	               bool echo) :_n(n), _m(m), _evolution(evolution), _saveTo(savesTo), _loadFrom(loadFrom)
 {
 	this->_echo = echo;
 	this->_field = new Field(n, m);
@@ -76,6 +83,16 @@ LifeGame::~LifeGame()
 	{
 		delete (*it);
 	}
+}
+
+string & LifeGame::getSavesPath()
+{
+	return (this->_saveTo);
+}
+
+string & LifeGame::getLoadPath()
+{
+	return (this->_loadFrom);
 }
 
 void LifeGame::setPause(unsigned int time_)
@@ -165,12 +182,7 @@ void LifeGame::step()
 		}
 	}
 
-	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
-	{
-		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
-		if (tmp != this->players.end())
-			tmp = this->players.erase(tmp);
-	}
+	eraseOddPlayers();
 
 	// if alive player stays on food cell health++
 	for (auto pl = this->players.begin(); pl != this->players.end(); ++pl) // S(0)
@@ -190,7 +202,7 @@ void LifeGame::step()
 			}
 		}
 		// every player health --
-		(*pl)->addHealth(-5.0f);
+		(*pl)->addHealth(STEPDECREACE);
 		// check if dead
 		// put all dead players into vector of dead with mark of current step number
 		if ((*pl)->getHealth() <= 0)
@@ -201,14 +213,13 @@ void LifeGame::step()
 
 			this->deadPlayers.push_back(tmpDead);
 		}
+		else if ((*pl)->getHealth() > MAXHEALTH)
+		{
+			(*pl)->setHealth(MAXHEALTH);
+		}
 	}
 
-	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
-	{
-		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
-		if (tmp != this->players.end())
-			tmp = this->players.erase(tmp);
-	}
+	eraseOddPlayers();
 
 	this->_field->clearField(); // make all cells ' ' then we will rewrite every symbol
 
@@ -230,10 +241,10 @@ void LifeGame::step()
 		this->_field->printField();
 		Sleep(this->_pause);
 	}
-	// Go to beginning
+	
 }
 
-void LifeGame::play()
+void LifeGame::play(vector<int> &results)
 {
 	while (this->players.size() != 0 && this->_step < MAXSTEPS)
 	{
@@ -249,31 +260,87 @@ void LifeGame::play()
 	cout << "evolution #" << this->_evolution << "\n";
 	if (this->_pause > 0)
 		Sleep(PAUSE_BETWEEN_GAMES * this->_pause);
-	this->_evolution++;
-	teach();
 
-	for (int i = 0; i < this->deadPlayers.size(); i++)
+	float minResult = -DEFAULTHEALTH / STEPDECREACE;
+	float efficiency = this->deadPlayers[deadPlayers.size() - 1]->lastStep / minResult;
+
+	cout << "\n\nEfficiency: " << efficiency;
+
+	//Update results vector
+	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
 	{
-		this->deadPlayers[i]->_player->saveWeights();
+		results[(*it)->_player->getID()] += (*it)->lastStep;
 	}
+
+	if (this->_evolution % MUTATEEVERY == 0 && this->_evolution!=0)
+	{
+		teach(results);
+
+		for (int i = 0; i < this->deadPlayers.size(); i++)
+		{
+			this->deadPlayers[i]->_player->saveWeights();
+		}
+
+		for (auto it = results.begin(); it != results.end(); ++it)
+			(*it) = 0;
+	}
+
+	if (efficiency > 3.0)
+	{
+		NeuralNetwork* bestPlayerNeuro = this->deadPlayers[this->deadPlayers.size() - 1]->_player->neuro;
+		for (int i = 0; i < this->deadPlayers.size()-1; i++)
+		{
+			NeuralNetwork* deadiNet = this->deadPlayers[i]->_player->neuro;
+			deadiNet->crossLayers("input", *bestPlayerNeuro->getLayer("input"), 1);
+			deadiNet->crossLayers("between1", *bestPlayerNeuro->getLayer("between1"), 30);
+			deadiNet->crossLayers("between2", *bestPlayerNeuro->getLayer("between2"), 10);
+			this->deadPlayers[i]->_player->saveWeights();
+		}
+		this->deadPlayers[this->deadPlayers.size() - 1]->_player->saveWeights();
+		return;
+	}
+
+	this->_evolution++;
 }
 
-void LifeGame::teach()
+void LifeGame::teach(vector<int> &results)
 {
-	if (this->deadPlayers.size() < 5)
-		return;
-	for (int i = 5; i < 7; i++)
+	Player* etalonPlayer = nullptr;
+	Player* lowestPlayer = nullptr;
+	float etalonEff = 0.0f;
+	float lowestEff = 1000.0f;
+	for (auto pl = this->deadPlayers.begin(); pl != this->deadPlayers.end(); ++pl)
 	{
-		this->deadPlayers[i]->_player->mutatePartly();
+		float minEff = -((DEFAULTHEALTH / STEPDECREACE)*MUTATEEVERY);
+		float eff = -results[(*pl)->_player->getID()]/ minEff;
+		if (eff > etalonEff)
+		{
+			etalonPlayer = (*pl)->_player;
+			etalonEff = eff;
+		}
+		if (eff < lowestEff)
+		{
+			lowestPlayer = (*pl)->_player;
+			lowestEff = eff;
+		}
 	}
-	for (int i = 7; i < this->deadPlayers.size(); i++)
+	lowestPlayer->mutate(-0.2f,0.2f);
+	if (etalonPlayer != nullptr)
 	{
-		//this->deadPlayers[i]->_player->copyNeuro(*this->deadPlayers[i - 7]->_player); // copy neuro from best guys
-		NeuralNetwork* deadiNet = this->deadPlayers[i]->_player->neuro;
-		NeuralNetwork* deadi_7Net = this->deadPlayers[i - 7]->_player->neuro;
-		deadiNet->crossLayers("input",    *deadi_7Net->getLayer("input"), 1);
-		deadiNet->crossLayers("between1", *deadi_7Net->getLayer("between1"), 30);
-		deadiNet->crossLayers("between2", *deadi_7Net->getLayer("between2"), 10);
+		if (etalonPlayer->neuro != nullptr)
+		{
+			NeuralNetwork* etalonNeuro = etalonPlayer->neuro;
+			for (int i = 0; i < this->deadPlayers.size(); i++)
+			{
+				NeuralNetwork* deadiNet = this->deadPlayers[i]->_player->neuro;
+				if (deadiNet != etalonNeuro)
+				{
+					deadiNet->crossLayers("input", *etalonNeuro->getLayer("input"), 1);
+					deadiNet->crossLayers("between1", *etalonNeuro->getLayer("between1"), 30);
+					deadiNet->crossLayers("between2", *etalonNeuro->getLayer("between2"), 10);
+				}
+			}
+		}
 	}
 }
 
@@ -310,14 +377,14 @@ void LifeGame::printField()
 float * LifeGame::formInputVector(Player * formFor)
 {
 	float* mas = new float[6];
-	mas[0] = formFor->getHealth();
+	mas[0] = formFor->getHealth() / MAXHEALTH;
 
 	//** ENEMY **//
 	if (this->players.size() == 1)
 	{
-		mas[1] = MAXLEN;
-		mas[2] = MAXLEN;
-		mas[3] = MAXLEN; // enemy far away & has big health
+		mas[1] = 0; //won't be activated
+		mas[2] = 0;
+		mas[3] = 0;
 	}
 	else
 	{
@@ -336,9 +403,15 @@ float * LifeGame::formInputVector(Player * formFor)
 				}
 			}
 		}
-		mas[1] = float(etalonPlayer->get_X() - formFor->get_X());
-		mas[2] = float(etalonPlayer->get_Y() - formFor->get_Y());
-		mas[3] = float(etalonPlayer->getHealth());
+		float dx = float(etalonPlayer->get_X() - formFor->get_X());
+		float dy = float(etalonPlayer->get_Y() - formFor->get_Y());
+		float distance = sqrt(dx*dx + dy * dy);
+		if (distance < FLT_EPSILON)
+			mas[1] = 0.0f;
+		else
+			mas[1] = dy / distance;
+		mas[2] = distance;
+		mas[3] = float(etalonPlayer->getHealth()) / MAXHEALTH;
 	}
 
 	//** FOOD **//
@@ -357,13 +430,19 @@ float * LifeGame::formInputVector(Player * formFor)
 	}
 	if (etalonFood == nullptr)
 	{
-		mas[4] = MAXLEN;
-		mas[5] = MAXLEN;
+		mas[4] = 0; // no activation
+		mas[5] = 0;
 	}
 	else
 	{
-		mas[4] = float(etalonFood->pos_x - formFor->get_X());
-		mas[5] = float(etalonFood->pos_y - formFor->get_Y());
+		float dx = float(etalonFood->pos_x - formFor->get_X());
+		float dy = float(etalonFood->pos_y - formFor->get_Y());
+		float distance = sqrt(dx*dx + dy * dy);
+		if (distance < FLT_EPSILON)
+			mas[4] = 0.0f;
+		else
+			mas[4] = dy / distance;
+		mas[5] = distance;
 	}
 
 	return mas;
@@ -398,6 +477,16 @@ void LifeGame::assigneCells()
 	for (auto fd = this->food.begin(); fd != this->food.end(); ++fd)
 	{
 		this->_field->setXY((*fd)->pos_x, (*fd)->pos_y, '+');
+	}
+}
+
+void LifeGame::eraseOddPlayers()
+{
+	for (auto it = this->deadPlayers.begin(); it != this->deadPlayers.end(); ++it)
+	{
+		auto tmp = find(this->players.begin(), this->players.end(), (*it)->_player);
+		if (tmp != this->players.end())
+			tmp = this->players.erase(tmp);
 	}
 }
 
