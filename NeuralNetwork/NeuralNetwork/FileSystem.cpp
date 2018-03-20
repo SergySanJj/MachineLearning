@@ -1,77 +1,7 @@
 #include "FileSystem.h"
 #include "NeuralNetwork.h"
 
-int DeleteDirectory(const string& pathToDelDir, bool bDeleteSubdirectories = 1)
-{
-	bool            bSubdirectory = false;       // Flag, true if subdirectories have been found.
-	HANDLE          hFile;                       // Handle to directory.
-	string          strFilePath;                 // Filepath.
-	string          strPattern;                  // Pattern.
-	WIN32_FIND_DATA FileInformation;             // File information.
-
-	strPattern = pathToDelDir + "\\*.*";
-	hFile = ::FindFirstFile(strPattern.c_str(), &FileInformation);
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			if (FileInformation.cFileName[0] != '.')
-			{
-				strFilePath.erase();
-				strFilePath = pathToDelDir + "\\" + FileInformation.cFileName;
-
-				if (FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-				{
-					if (bDeleteSubdirectories)
-					{
-						// Delete subdirectory.
-						int iRC = DeleteDirectory(strFilePath, bDeleteSubdirectories);
-						if (iRC)
-						{
-							::FindClose(hFile);
-							return iRC;
-						}
-							
-					}
-					else
-						bSubdirectory = true;
-				}
-				else
-				{
-					// Set file attributes.
-					if (::SetFileAttributes(strFilePath.c_str(), FILE_ATTRIBUTE_NORMAL) == FALSE)
-						return ::GetLastError();
-
-					// Delete file.
-					if (::DeleteFile(strFilePath.c_str()) == FALSE)
-						return ::GetLastError();
-				}
-			}
-		} while (::FindNextFile(hFile, &FileInformation) != FALSE);
-
-		// Close handle.
-		::FindClose(hFile);
-
-		DWORD dwError = ::GetLastError();
-		if (dwError != ERROR_NO_MORE_FILES)
-			return dwError;
-		else
-		{
-			if (!bSubdirectory)
-			{
-				// Set directory attributes.
-				if (::SetFileAttributes(pathToDelDir.c_str(), FILE_ATTRIBUTE_NORMAL) == FALSE)
-					return ::GetLastError();
-
-				// Delete directory.
-				if (::RemoveDirectory(pathToDelDir.c_str()) == FALSE)
-					return ::GetLastError();
-			}
-		}
-	}
-
-	return 0;
-}
+int DeleteDirectory(const string& pathToDelDir, bool bDeleteSubdirectories = 1);
 
 string wstrtTostr(const wstring &ws)
 {
@@ -167,4 +97,78 @@ wstring FileSystem::strToWstr(const string&  s)
 {
 	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.from_bytes(s);
+}
+
+
+
+int DeleteDirectory(const string& pathToDelDir, bool bDeleteSubdirectories)
+{
+	bool            bSubdirectory = false;       // Flag, true if subdirectories have been found.
+	HANDLE          hFile;                       // Handle to directory.
+	string          strFilePath;                 // Filepath.
+	string          strPattern;                  // Pattern.
+	WIN32_FIND_DATA FileInformation;             // File information.
+
+	strPattern = pathToDelDir + "\\*.*";
+	hFile = ::FindFirstFile(strPattern.c_str(), &FileInformation);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			if (FileInformation.cFileName[0] != '.')
+			{
+				strFilePath.erase();
+				strFilePath = pathToDelDir + "\\" + FileInformation.cFileName;
+
+				if (FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				{
+					if (bDeleteSubdirectories)
+					{
+						// Delete subdirectory.
+						int iRC = DeleteDirectory(strFilePath, bDeleteSubdirectories);
+						if (iRC)
+						{
+							::FindClose(hFile);
+							return iRC;
+						}
+
+					}
+					else
+						bSubdirectory = true;
+				}
+				else
+				{
+					// Set file attributes.
+					if (::SetFileAttributes(strFilePath.c_str(), FILE_ATTRIBUTE_NORMAL) == FALSE)
+						return ::GetLastError();
+
+					// Delete file.
+					if (::DeleteFile(strFilePath.c_str()) == FALSE)
+						return ::GetLastError();
+				}
+			}
+		} while (::FindNextFile(hFile, &FileInformation) != FALSE);
+
+		// Close handle.
+		::FindClose(hFile);
+
+		DWORD dwError = ::GetLastError();
+		if (dwError != ERROR_NO_MORE_FILES)
+			return dwError;
+		else
+		{
+			if (!bSubdirectory)
+			{
+				// Set directory attributes.
+				if (::SetFileAttributes(pathToDelDir.c_str(), FILE_ATTRIBUTE_NORMAL) == FALSE)
+					return ::GetLastError();
+
+				// Delete directory.
+				if (::RemoveDirectory(pathToDelDir.c_str()) == FALSE)
+					return ::GetLastError();
+			}
+		}
+	}
+
+	return 0;
 }
