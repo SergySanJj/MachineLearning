@@ -15,7 +15,7 @@ using namespace std;
 #define MAXHEALTH 400.0f
 #define STEPDECREACE -5.0f
 
-#define MUTATEEVERY 3
+#define MUTATEEVERY 10
 #define MINEFF ((DEFAULTHEALTH/ STEPDECREACE)*MUTATEEVERY)
 
 #define EMPTY_  ' '

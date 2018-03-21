@@ -18,15 +18,15 @@ int main()
 
 	string savesPath = "F:\\work\\Git\\MachineLearning\\NeuralNetwork\\NeuralNetwork\\PlayersSaves\\player_";
 
-	for (int i = 0; i < 1500; i++)
+	for (int i = 0; i < 800; i++)
 	{
 		LifeGame* ldf = new LifeGame(40, 40, numPlayers, i, savesPath, savesPath,0);
 		if (i == 0)
 		{
-			//ldf->initializeAllWithRnd(-10.0f, 10.0f);
+			//ldf->initializeAllWithRnd(-1.0f, 1.0f);
 		}
-		ldf->setPause(100);
-		//ldf->echoPrint(0);
+		ldf->setPause(0);
+		ldf->echoPrint(0);
 		ldf->play(res);
 		tmpVec = ldf->getResult();
 		delete ldf;
